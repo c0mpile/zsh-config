@@ -1,5 +1,5 @@
 # zsh configuration          
-# https://github.com/c0mpile/dotfiles 
+# https://github.com/c0mpile/ 
 
 ################################
 # Powerlevel10k instant prompt #
@@ -8,20 +8,19 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-
 #########################
-# Environment Variables #
+# Environment variables #
 #########################
-PATH="$HOME/.local/bin:$HOME/.local/scripts:$HOME/bin:$HOME/.cargo/bin:$PATH" 
+PATH="$HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin:$PATH" 
 ZDOTDIR="$HOME/.config/zsh"
-ZPLUGINDIR=${ZPLUGINDIR:-${ZDOTDIR:-$HOME/.config/zsh}/plugins}
-ZSH_CACHE_DIR=${ZSH_CACHE_DIR:-${ZDOTDIR:-$HOME/.config/zsh}/cache}
+ZPLUGINDIR="${ZPLUGINDIR:-${ZDOTDIR:-$HOME/.config/zsh}/plugins}"
+ZSH_CACHE_DIR="${ZSH_CACHE_DIR:-${ZDOTDIR:-$HOME/.config/zsh}/cache}"
 EDITOR="nvim"
 VISUAL="nvim"
-HISTSIZE=5000
-HISTFILE=~/.zsh_history
-SAVEHIST=$HISTSIZE
-HISTDUP=erase
+HISTSIZE='5000'
+HISTFILE="$HOME/.zsh_history"
+SAVEHIST="$HISTSIZE"
+HISTDUP="erase"
 
 #############
 # Functions #
@@ -66,20 +65,9 @@ function plugin-update {
   done
 }
 
-dumpload() {
-  docker run --rm -v "${PWD}":/data -it vm03/payload_dumper /data/payload.bin --out /data
-}
-
-adboptimize() {
-  adb shell cmd package compile -m speed-profile -f -a;
-  adb shell cmd package bg-dexopt-job
-}
-
 ###########
 # Plugins #
 ###########
-mkdir -p $ZDOTDIR/{plugins,cache} # create plugin and cache directories if they don't exist
-
 # external plugin repos
 repos=(
   romkatv/powerlevel10k
@@ -92,13 +80,14 @@ repos=(
   Aloxaf/fzf-tab
   unixorn/fzf-zsh-plugin
   unixorn/git-extra-commands
-  robSis/zsh-completion-generator
   c0mpile/zypper.zsh
 )
 
 plugin-clone $repos # clone plugin repos
 
 # load completions
+fpath=( "$ZSH_CACHE_DIR/completions" $fpath )
+
 autoload -Uz compinit
 compinit
 
@@ -121,35 +110,13 @@ plugins=(
   zsh-history-substring-search
   fast-syntax-highlighting
   zypper.zsh
-  ohmyzsh/plugins/chezmoi
-  ohmyzsh/plugins/colored-man-pages
+  ohmyzsh/plugins/archlinux
   ohmyzsh/plugins/command-not-found
   ohmyzsh/plugins/dnf
-  ohmyzsh/plugins/docker
-  ohmyzsh/plugins/docker-compose
   ohmyzsh/plugins/encode64
-  ohmyzsh/plugins/gh
-  ohmyzsh/plugins/git
-  ohmyzsh/plugins/github
-  ohmyzsh/plugins/kitty
-  ohmyzsh/plugins/npm
-  ohmyzsh/plugins/nvm
-  ohmyzsh/plugins/pip
-  ohmyzsh/plugins/pipenv
-  ohmyzsh/plugins/podman
-  ohmyzsh/plugins/python
-  ohmyzsh/plugins/rbw
-  ohmyzsh/plugins/rust
   ohmyzsh/plugins/safe-paste
   ohmyzsh/plugins/sudo
-  ohmyzsh/plugins/systemd
-  ohmyzsh/plugins/tmux
-  ohmyzsh/plugins/tmuxinator
-  ohmyzsh/plugins/toolbox
   ohmyzsh/plugins/universalarchive
-  ohmyzsh/plugins/vscode
-  ohmyzsh/plugins/yum
-  ohmyzsh/plugins/zoxide
 )
 
 # load remaining plugins
@@ -183,19 +150,17 @@ setopt rcquotes
 # Keybinds #
 ############
 bindkey '^[s' sudo-command-line
-#bindkey -M vicmd '^[s' sudo-command-line
-#bindkey -M viins '^[s' sudo-command-line
 
 #####################
 # Style completions #
 #####################
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-#zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' menu no
+zstyle ':completion:*' use-cache on
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always $realpath'
-zstyle ':fzf-tab:*' fzf-flags --bind=right:accept
-
+zstyle ':fzf-tab:*' fzf-flags --bind=right:accept,ctrl-space:toggle+down,ctrl-a:toggle-all
+zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
 
 ###########
 # Aliases #
