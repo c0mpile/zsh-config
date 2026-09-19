@@ -1,0 +1,39 @@
+#!/usr/bin/env zsh
+
+local -i ret
+
+if [[ ${CONTEXT-} != start || -v _zconf_transient_rprompt ]]; then
+  if [[ ${CONTEXT} == start ]]; then
+    unsetopt transient_rprompt
+    unset _zconf_transient_rprompt
+  elif [[ ! -o transient_rprompt ]]; then
+    setopt transient_rprompt
+    typeset -g _zconf_transient_rprompt=
+  fi
+fi
+
+if (( ${+widgets[-zconf-orig-zle-line-init]} )); then
+  zle -- -zconf-orig-zle-line-init "$@" || ret=$?
+fi
+
+if (( ${+_zconf_redraw_fd} )); then
+  zle -F "$_zconf_redraw_fd"
+  exec {_zconf_redraw_fd}>&-
+  unset _zconf_redraw_fd
+fi
+
+unset POSTDISPLAY _zconf_autosuggest_buffer _zconf_autosuggestion _zsh_highlight__highlighter_${^ZSH_HIGHLIGHT_HIGHLIGHTERS}_cache
+typeset -g _ZSH_HIGHLIGHT_PRIOR_BUFFER=
+typeset -gi _ZSH_HIGHLIGHT_PRIOR_CURSOR=CURSOR
+region_highlight=()
+
+if [[ ${(%):-%~} != ${_zconf_last_dir-} && ! -v _zconf_dir_hist_fd ]]; then
+  typeset -gi _zconf_dir_hist_fd
+  if sysopen -o cloexec -ru _zconf_dir_hist_fd /dev/null; then
+    zle -F $_zconf_dir_hist_fd -zconf-update-dir-history
+  else
+    unset _zconf_dir_hist_fd
+  fi
+fi
+
+return ret

@@ -1,0 +1,40 @@
+#!/usr/bin/env zsh
+
+local -i ret
+
+if (( ${+widgets[-zconf-orig-zle-line-pre-redraw]} )); then
+  zle -- -zconf-orig-zle-line-pre-redraw "$@" || ret=$?
+fi
+
+if (( ${+_zconf_substring_search_highlight} )) &&
+   [[ ${_history_substring_search_cursor-} != $CURSOR ||
+      ${_history_substring_search_result-} != $BUFFER ]]; then
+  typeset -g _history_substring_search_result=
+  typeset -g _history_substring_search_query_highlight=
+  unset _zconf_substring_search_highlight _history_substring_search_cursor
+fi
+
+if (( PENDING || KEYS_QUEUED_COUNT )); then
+  if (( ! ${+_zconf_redraw_fd} )); then
+    typeset -gi _zconf_redraw_fd
+    if sysopen -o cloexec -ru _zconf_redraw_fd /dev/null; then
+      zle -F $_zconf_redraw_fd -zconf-redraw-buffer
+    else
+      unset _zconf_redraw_fd
+    fi
+  fi
+  if [[ -n "${POSTDISPLAY-}" &&
+        "${#BUFFER}" -ne "${#_zconf_autosuggest_buffer}" &&
+        -v region_highlight ]]; then
+    POSTDISPLAY=${_zconf_autosuggestion:${#BUFFER}}
+    if [[ -n "$POSTDISPLAY" ]]; then
+      region_highlight[-1]="${#BUFFER} $((${#BUFFER} + ${#POSTDISPLAY})) $ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE"
+    else
+      unset POSTDISPLAY _zconf_autosuggest_buffer _zconf_autosuggestion
+    fi
+  fi
+else
+  -zconf-redraw-buffer
+fi
+
+return ret

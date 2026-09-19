@@ -14,39 +14,39 @@ END
     ;;
     o)
       if [ -n "$old" ]; then
-        >&2 echo "[z4h/setup] error: duplicate option: -$opt"
+        >&2 echo "[zconf/setup] error: duplicate option: -$opt"
         exit 1
       fi
       old="$OPTARG"
     ;;
     n)
       if [ -n "$new" ]; then
-        >&2 echo "[z4h/setup] error: duplicate option: -$opt"
+        >&2 echo "[zconf/setup] error: duplicate option: -$opt"
         exit 1
       fi
       new="$OPTARG"
     ;;
-    \?) >&2 echo "[z4h/setup] error: invalid option: -$OPTARG"           ; exit 1;;
-    :)  >&2 echo "[z4h/setup] error: missing required argument: -$OPTARG"; exit 1;;
-    *)  >&2 echo "[z4h/setup] internal error: unhandled option: -$opt"   ; exit 1;;
+    \?) >&2 echo "[zconf/setup] error: invalid option: -$OPTARG"           ; exit 1;;
+    :)  >&2 echo "[zconf/setup] error: missing required argument: -$OPTARG"; exit 1;;
+    *)  >&2 echo "[zconf/setup] internal error: unhandled option: -$opt"   ; exit 1;;
   esac
 done
 
 if [ "$OPTIND" -le $# ]; then
-  >&2 echo "[z4h/setup] error: unexpected positional argument"
+  >&2 echo "[zconf/setup] error: unexpected positional argument"
   exit 1
 fi
 
 if [ -z "$new" ]; then
-  >&2 echo "[z4h/setup] error: missing required option: -n"
+  >&2 echo "[zconf/setup] error: missing required option: -n"
   exit 1
 fi
 
 command find "$self" -name '*.zwc' -exec rm -f -- '{}' '+'               || exit
 
 command mkdir -p -- "$new"/bin "$new"/fn "$new"/cache/ohmyzsh "$new"/tmp || exit
-if [ ! -L "$new"/z4h.zsh ]; then
-  command cp -f -- "$self"/../z4h.zsh "$new"/                            || exit
+if [ ! -L "$new"/zconf.zsh ]; then
+  command cp -f -- "$self"/../zconf.zsh "$new"/                            || exit
 fi
 if [ ! -e "$new"/cache/last-update-ts ]; then
   echo -n >"$new"/cache/last-update-ts                                   || exit

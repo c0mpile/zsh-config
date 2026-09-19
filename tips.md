@@ -35,7 +35,7 @@ in `tmux`, you'll have the following snippet in `~/.zshrc`:
 
 ```zsh
 # Don't start tmux.
-zstyle ':z4h:' start-tmux no
+zstyle ':zconf:' start-tmux no
 ```
 
 Several features in Zsh for Humans require knowing the content of the terminal
@@ -52,7 +52,7 @@ the same directory as the current tab, and it doesn't work, add the following
 option:
 
 ```zsh
-zstyle ':z4h:' propagate-cwd yes
+zstyle ':zconf:' propagate-cwd yes
 ```
 
 If terminal title breaks, see [Terminal Title](#terminal-title).
@@ -60,7 +60,7 @@ If terminal title breaks, see [Terminal Title](#terminal-title).
 If vertically resizing the terminal window breaks scrollback, add this option:
 
 ```zsh
-zstyle ':z4h:' term-vresize top
+zstyle ':zconf:' term-vresize top
 ```
 
 If mouse wheel scrolling stops working in some applications, enable mouse
@@ -80,7 +80,7 @@ starts and upon pressing <kbd>Ctrl+L</kbd>:
 
 ```zsh
 # Move prompt to the bottom when zsh starts and on Ctrl+L.
-zstyle ':z4h:' prompt-at-bottom 'yes'
+zstyle ':zconf:' prompt-at-bottom 'yes'
 ```
 
 This feature requires that [`start-tmux` is not set to `no`](#tmux).
@@ -89,7 +89,7 @@ If you have a habit of running `clear` instead of pressing <kbd>Ctrl+L</kbd>,
 you can add this alias:
 
 ```zsh
-alias clear=z4h-clear-screen-soft-bottom
+alias clear=zconf-clear-screen-soft-bottom
 ```
 
 Note that having prompt always at the *top* is [impossible](
@@ -103,8 +103,8 @@ autosuggestions. The only exceptions are `forward-char`, `vi-forward-char` and
 character or one line. This can be fixed with the following options:
 
 ```zsh
-zstyle ':z4h:autosuggestions' forward-char partial-accept
-zstyle ':z4h:autosuggestions' end-of-line  partial-accept
+zstyle ':zconf:autosuggestions' forward-char partial-accept
+zstyle ':zconf:autosuggestions' end-of-line  partial-accept
 ```
 
 ## Shell integration
@@ -113,7 +113,7 @@ Add the following option to `~/.zshrc`:
 
 ```zsh
 # Mark up shell's output with semantic information.
-zstyle ':z4h:' term-shell-integration 'yes'
+zstyle ':zconf:' term-shell-integration 'yes'
 ```
 
 This enables extra features in terminals that understand [OSC 133](
@@ -143,12 +143,12 @@ Add the following option to `~/.zshrc` to make transient prompt work
 consistently when closing an SSH connection:
 
 ```zsh
-z4h bindkey z4h-eof Ctrl+D
+zconf bindkey zconf-eof Ctrl+D
 setopt ignore_eof
 ```
 
-This preserves the default zsh behavior on Ctrl+D. You can bind `z4h-exit`
-instead of `z4h-eof` if you want Ctrl+D to always exit the shell.
+This preserves the default zsh behavior on Ctrl+D. You can bind `zconf-exit`
+instead of `zconf-eof` if you want Ctrl+D to always exit the shell.
 
 If you are using a two-line prompt with an empty line before it, add this for
 smoother rendering:
@@ -164,12 +164,12 @@ without an empty line, add this instead:
 POSTEDIT=$'\n\e[A'
  ```
 
-You can bind `Enter` to `z4h-accept-line` to insert a newline instead of
+You can bind `Enter` to `zconf-accept-line` to insert a newline instead of
 displaying the secondary prompt (a.k.a. `PS2`) when the currently typed
 command is incomplete.
 
 ```zsh
-z4h bindkey z4h-accept-line Enter
+zconf bindkey zconf-accept-line Enter
 ```
 
 ## Terminal title
@@ -177,18 +177,18 @@ z4h bindkey z4h-accept-line Enter
 Some terminals by default do not allow shell to set tab and window title. This
 can be changed in the terminal preferences.
 
-Terminal title can be customized with `:z4h:term-title` style. Here are the
+Terminal title can be customized with `:zconf:term-title` style. Here are the
 defaults:
 
 ```zsh
-zstyle ':z4h:term-title:ssh'   preexec '%n@%m: ${1//\%/%%}'
-zstyle ':z4h:term-title:ssh'   precmd  '%n@%m: %~'
-zstyle ':z4h:term-title:local' preexec '${1//\%/%%}'
-zstyle ':z4h:term-title:local' precmd  '%~'
+zstyle ':zconf:term-title:ssh'   preexec '%n@%m: ${1//\%/%%}'
+zstyle ':zconf:term-title:ssh'   precmd  '%n@%m: %~'
+zstyle ':zconf:term-title:local' preexec '${1//\%/%%}'
+zstyle ':zconf:term-title:local' precmd  '%~'
 ```
 
-`:z4h:term-title:ssh` is applied when connected over SSH while
-`:z4h:term-title:local` is applied to local shells.
+`:zconf:term-title:ssh` is applied when connected over SSH while
+`:zconf:term-title:local` is applied to local shells.
 
 `preexec` title is set before executing a command: `$1` is the unexpanded
 command line, `$2` is the same command line after alias expansion.
@@ -201,7 +201,7 @@ All values undergo prompt expansion.
 Tip: Add `%*` to `preexec` to display the time when the command started
 executing.
 
-Tip: Replace `%m` with `${${${Z4H_SSH##*:}//\%/%%}:-%m}`. This makes a
+Tip: Replace `%m` with `${${${ZCONF_SSH##*:}//\%/%%}:-%m}`. This makes a
 difference when using [SSH teleportation](#SSH): the title will show the
 hostname as you typed it on the command line when connecting rather than
 the hostname reported by the remote machine.
@@ -219,22 +219,22 @@ hosts. You can use either a blacklist approach:
 
 ```zsh
 # Enable SSH teleportation by default.
-zstyle ':z4h:ssh:*'                   enable yes
+zstyle ':zconf:ssh:*'                   enable yes
 
 # Disable SSH teleportation for specific hosts.
-zstyle ':z4h:ssh:example-hostname1'   enable no
-zstyle ':z4h:ssh:*.example-hostname2' enable no
+zstyle ':zconf:ssh:example-hostname1'   enable no
+zstyle ':zconf:ssh:*.example-hostname2' enable no
 ```
 
 Or a whitelist approach:
 
 ```zsh
 # Disable SSH teleportation by default.
-zstyle ':z4h:ssh:*'                   enable no
+zstyle ':zconf:ssh:*'                   enable no
 
 # Enable SSH teleportation for specific hosts.
-zstyle ':z4h:ssh:example-hostname1'   enable yes
-zstyle ':z4h:ssh:*.example-hostname2' enable yes
+zstyle ':zconf:ssh:example-hostname1'   enable yes
+zstyle ':zconf:ssh:*.example-hostname2' enable yes
 ```
 
 ### Extra dotfiles
@@ -243,7 +243,7 @@ If your shell environment requires extra files other than zsh rc files (which
 are teleported by default), add them to `send-extra-files`:
 
 ```zsh
-zstyle ':z4h:ssh:*' send-extra-files '~/.nanorc' '~/.env.zsh'
+zstyle ':zconf:ssh:*' send-extra-files '~/.nanorc' '~/.env.zsh'
 ```
 
 You can add directories here as well. Don't add anything heavy as it'll slow
@@ -259,19 +259,19 @@ host when teleporting.
 When connected over SSH, by default prompt and terminal title will display the
 hostname as reported by the remote machine. Sometimes it's not the same as
 what you've passed to `ssh` on the command line and usually you would want to
-see the latter. To achieve this, use  `${${${Z4H_SSH##*:}//\%/%%}:-%m}` instead
+see the latter. To achieve this, use  `${${${ZCONF_SSH##*:}//\%/%%}:-%m}` instead
 of `%m` in configuration options. For example, here's how you can configure
 terminal title:
 
 ```zsh
-zstyle ':z4h:term-title:ssh' preexec '%n@'${${${Z4H_SSH##*:}//\%/%%}:-%m}': ${1//\%/%%}'
-zstyle ':z4h:term-title:ssh' precmd  '%n@'${${${Z4H_SSH##*:}//\%/%%}:-%m}': %~'
+zstyle ':zconf:term-title:ssh' preexec '%n@'${${${ZCONF_SSH##*:}//\%/%%}:-%m}': ${1//\%/%%}'
+zstyle ':zconf:term-title:ssh' precmd  '%n@'${${${ZCONF_SSH##*:}//\%/%%}:-%m}': %~'
 ```
 
 And here's prompt:
 
 ```zsh
-typeset -g POWERLEVEL9K_CONTEXT_TEMPLATE=%n@${${${Z4H_SSH##*:}//\%/%%}:-%m}
+typeset -g POWERLEVEL9K_CONTEXT_TEMPLATE=%n@${${${ZCONF_SSH##*:}//\%/%%}:-%m}
 ```
 
 The latter should go in `~/.p10k.zsh`. You might already have some `CONTEXT`
@@ -304,8 +304,8 @@ up) but you never start commands with backtick.
 If your OS doesn't start SSH agent automatically, add this to `~/.zshrc`:
 
 ```zsh
-zstyle ':z4h:ssh-agent:' start      yes
-zstyle ':z4h:ssh-agent:' extra-args -t 20h
+zstyle ':zconf:ssh-agent:' start      yes
+zstyle ':zconf:ssh-agent:' extra-args -t 20h
 ```
 
 It's a good idea to list all hosts that you SSH to in `~/.ssh/config`. Like
@@ -339,31 +339,31 @@ is very flexible but not easy to configure. Here's something to get you started.
 #
 # Within this function we have readonly access to the following parameters:
 #
-# - z4h_ssh_client  local hostname
-# - z4h_ssh_host    remote hostname as it was specified on the command line
+# - zconf_ssh_client  local hostname
+# - zconf_ssh_host    remote hostname as it was specified on the command line
 #
 # We also have read & write access to these:
 #
-# - z4h_ssh_enable          1 to use ssh teleportation, 0 for plain ssh
-# - z4h_ssh_send_files      list of files to send to the remote; keys are local
+# - zconf_ssh_enable          1 to use ssh teleportation, 0 for plain ssh
+# - zconf_ssh_send_files      list of files to send to the remote; keys are local
 #                           file names, values are remote file names
-# - z4h_ssh_retrieve_files  the same as z4h_ssh_send_files but for pulling
+# - zconf_ssh_retrieve_files  the same as zconf_ssh_send_files but for pulling
 #                           files from remote to local
-# - z4h_retrieve_history    list of local files into which remote $HISTFILE
+# - zconf_retrieve_history    list of local files into which remote $HISTFILE
 #                           should be merged at the end of the connection
-# - z4h_ssh_command         command to use instead of `ssh`
-function z4h-ssh-configure() {
+# - zconf_ssh_command         command to use instead of `ssh`
+function zconf-ssh-configure() {
   emulate -L zsh
 
   # Bail out if ssh teleportation is disabled. We could also
   # override this parameter here if we wanted to.
-  (( z4h_ssh_enable )) || return 0
+  (( zconf_ssh_enable )) || return 0
 
   # Figure out what kind of machine we are about to connect to.
   local machine_tag
-  case $z4h_ssh_host in
+  case $zconf_ssh_host in
     ec2-*) machine_tag=ec2;;
-    *)     machine_tag=$z4h_ssh_host;;
+    *)     machine_tag=$zconf_ssh_host;;
   esac
 
   # This is where we are locally keeping command history
@@ -374,15 +374,15 @@ function z4h-ssh-configure() {
   # we connect to it. Command history from files with names like this
   # is explicitly loaded by our zshrc (see below). All new commands
   # on the remote machine will still be written to the regular $HISTFILE.
-  local remote_hist='"$ZDOTDIR"/.zsh/history/received_from_'${(q)z4h_ssh_client}
+  local remote_hist='"$ZDOTDIR"/.zsh/history/received_from_'${(q)zconf_ssh_client}
 
   # At the start of the SSH connection, send $local_hist over and
   # store it as $remote_hist.
-  z4h_ssh_send_files[$local_hist]=$remote_hist
+  zconf_ssh_send_files[$local_hist]=$remote_hist
 
   # At the end of the SSH connection, retrieve $HISTFILE from the
   # remote machine and merge it with $local_hist.
-  z4h_retrieve_history+=($local_hist)
+  zconf_retrieve_history+=($local_hist)
 }
 
 # Load command history that was sent to this machine over ssh.
@@ -395,30 +395,30 @@ function z4h-ssh-configure() {
 }
 ```
 
-You'll need to add this block to `~/.zshrc` below `z4h init`. Before trying it
+You'll need to add this block to `~/.zshrc` below `zconf init`. Before trying it
 out you'll probably want to modify the logic that computes `machine_tag` based
-on `$z4h_ssh_host` although you can also use it as is -- there is a reasonable
+on `$zconf_ssh_host` although you can also use it as is -- there is a reasonable
 fallback.
 
-If you are defining `z4h-ssh-configure`, you don't actually need to use
+If you are defining `zconf-ssh-configure`, you don't actually need to use
 ssh-specific zstyles but you still can if you want to. The function is invoked
 after zstyles are applied, so you can observe and/or override their effect
-within `z4h-ssh-configure`. For example, `z4h_ssh_enable` within the function is
-set to 0 or 1 according to the value of `zstyle :z4h:ssh:$hostname enable`. The
-implementation of `z4h-ssh-configure` posted above bails out if `z4h_ssh_enable`
+within `zconf-ssh-configure`. For example, `zconf_ssh_enable` within the function is
+set to 0 or 1 according to the value of `zstyle :zconf:ssh:$hostname enable`. The
+implementation of `zconf-ssh-configure` posted above bails out if `zconf_ssh_enable`
 is zero, so it doesn't do anything unless you enable SSH teleportation via
-`zstyle` for the target host. You could instead set `z4h_ssh_enable` in the
-function itself based on `$z4h_ssh_host` or anything else.
+`zstyle` for the target host. You could instead set `zconf_ssh_enable` in the
+function itself based on `$zconf_ssh_host` or anything else.
 
-You can add the following line at the top of `z4h-ssh-configure` to see the
+You can add the following line at the top of `zconf-ssh-configure` to see the
 initial values of all ssh parameters that Zsh for Humans lets you read/write.
 
 ```zsh
-typeset -pm 'z4h_ssh_*'
+typeset -pm 'zconf_ssh_*'
 ```
 
 You'll notice that there are a few more parameters than what is documented in
-the comments above `z4h-ssh-configure`. Those are low-level blocks of code that
+the comments above `zconf-ssh-configure`. Those are low-level blocks of code that
 get executed on the remote host. You probably shouldn't touch them.
 
 ### Unattended teleportation
@@ -435,7 +435,7 @@ ssh -t hostname <<<exit
 
 Replace `hostname` with a real hostname.
 
-The shebang says to execute this script with `zsh -i`, which makes `z4h`
+The shebang says to execute this script with `zsh -i`, which makes `zconf`
 function available to it.
 
 After you run this script, it's guaranteed that SSH teleportation will be fast
@@ -445,16 +445,16 @@ To forcefully update Zsh for Humans on the remote machine, replace the last line
 with this:
 
 ```zsh
-ssh -t hostname <<<$'z4h update\nexit'
+ssh -t hostname <<<$'zconf update\nexit'
 ```
 
 Usually this shouldn't be necessary because SSH teleportation automatically
 updates Zsh for Humans on the remote host if your local rc files require a newer
 version than what's available there. When a new feature is added to Zsh for
 Humans (a function, an alias, a zstyle, etc.), [version](
-  https://github.com/romkatv/zsh4humans/blob/v5/version) gets bumped. When
+  https://github.com/c0mpile/zsh-config/blob/v5/version) gets bumped. When
 teleporting, the version number of the local Zsh for Humans installation is sent
-over to the remote (it's the first part of `$Z4H_SSH`) and the remote is updated
+over to the remote (it's the first part of `$ZCONF_SSH`) and the remote is updated
 if its version is lower. This ensures that your rc files are compatible with
 Zsh for Humans on the remote host.
 
@@ -480,23 +480,23 @@ closest thing to [autojump](https://github.com/wting/autojump),
 You might want to configure things a bit differently:
 
 ```zsh
-zstyle ':z4h:fzf-dir-history' fzf-bindings tab:repeat
-zstyle ':z4h:cd-down'         fzf-bindings tab:repeat
+zstyle ':zconf:fzf-dir-history' fzf-bindings tab:repeat
+zstyle ':zconf:cd-down'         fzf-bindings tab:repeat
 
-z4h bindkey z4h-fzf-dir-history Alt+Down
+zconf bindkey zconf-fzf-dir-history Alt+Down
 ```
 
-This rebinds <kbd>Alt+Down</kbd> to `z4h-fzf-dir-history` -- the widget that you
+This rebinds <kbd>Alt+Down</kbd> to `zconf-fzf-dir-history` -- the widget that you
 can invoke via <kbd>Alt+R</kbd> by default. You'll no longer have a binding for
-`z4h-cd-down` but that's OK because you can get the same behavior with
+`zconf-cd-down` but that's OK because you can get the same behavior with
 <kbd>Alt+Down Tab</kbd>.
 
 The two `zstyle` lines rebind <kbd>Tab</kbd> in two fzf-based widgets from
 the default `up` to `repeat`. The latter causes the selection to get accepted
 (like pressing <kbd>Enter</kbd>) and immediately opens fzf once again. When you
-invoke `z4h-fzf-dir-history`, the first entry is always the current directory,
+invoke `zconf-fzf-dir-history`, the first entry is always the current directory,
 so `repeat` on that will repopulate fzf with subdirectories of the current
-directory -- just like `z4h-cd-down`. You can press <kbd>Tab</kbd> on other
+directory -- just like `zconf-cd-down`. You can press <kbd>Tab</kbd> on other
 entries, too, if you need to go into their subdirectories.
 
 ## Completions
@@ -505,7 +505,7 @@ Enable recursive file completions:
 
 ```zsh
 # Recursively traverse directories when TAB-completing files.
-zstyle ':z4h:fzf-complete' recurse-dirs yes
+zstyle ':zconf:fzf-complete' recurse-dirs yes
 ```
 
 This takes a bit of getting used to but once you do, it's a massive time saver.
@@ -513,7 +513,7 @@ This takes a bit of getting used to but once you do, it's a massive time saver.
 Rebind <kbd>Tab</kbd> in fzf from `up` to `repeat`:
 
 ```zsh
-zstyle ':z4h:fzf-complete' fzf-bindings tab:repeat
+zstyle ':zconf:fzf-complete' fzf-bindings tab:repeat
 ```
 
 Now <kbd>Tab</kbd> in fzf will accept the selection (like pressing
@@ -551,13 +551,13 @@ zstyle ':completion:*:(ssh|scp|rdp):*:hosts' hosts
 ## fzf
 
 Familiarize yourself with [fzf query syntax](
-  https://github.com/romkatv/zsh4humans#interactive-search-with-fzf).
+  https://github.com/c0mpile/zsh-config#interactive-search-with-fzf).
 
 The highlight color can be changed (from the default poisonous pink) with the
 following option:
 
 ```zsh
-zstyle ':z4h:*' fzf-flags --color=hl:5,hl+:5
+zstyle ':zconf:*' fzf-flags --color=hl:5,hl+:5
 ```
 
 Replace `5` with the color of your choice. Here's a handy one-liner to print
@@ -575,8 +575,8 @@ Next time you need to find this command, press <kbd>Ctrl+R</kbd> and type
 
 You can bind `*-zword` widgets that operate on whole shell arguments. For
 example, `ls '/foo/bar baz'` has two zwords: `ls` and `'/foo/bar baz'`. These
-widgets are `z4h-forward-zword`, `z4h-backward-zword`, `z4h-kill-zword` and
-`z4h-backward-kill-zword`. There are `word` variants of all these widgets, too.
+widgets are `zconf-forward-zword`, `zconf-backward-zword`, `zconf-kill-zword` and
+`zconf-backward-kill-zword`. There are `word` variants of all these widgets, too.
 They behave the same as word-based navigation in Visual Studio Code.
 
 ## Oh My Zsh
@@ -609,7 +609,7 @@ have zsh on the machine, you can bootstrap Zsh for Humans from any Bourne-based
 shell with the following command:
 
 ```sh
-Z4H_BOOTSTRAPPING=1 . ~/.zshenv
+ZCONF_BOOTSTRAPPING=1 . ~/.zshenv
 ```
 
 ## vi mode
@@ -619,8 +619,8 @@ preferred keymap. If you don't mind manually defining a few bindings, you can
 use Zsh for Humans in vi mode.
 
 1. Select *emacs* when asked by the installer about your preferred keymap.
-2. Add `bindkey -v` below `z4h init` in `~/.zshrc`.
-3. Add your own bindings with `bindkey` or `z4h bindkey` below `bindkey -v`.
+2. Add `bindkey -v` below `zconf init` in `~/.zshrc`.
+3. Add your own bindings with `bindkey` or `zconf bindkey` below `bindkey -v`.
 
 ## Managing dotfiles
 
@@ -691,7 +691,7 @@ than invoking `brew --prefix`. For example, here's how you can load
 [asdf](https://github.com/asdf-vm/asdf):
 
 ```zsh
-z4h source -- ${HOMEBREW_PREFIX:+$HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh}
+zconf source -- ${HOMEBREW_PREFIX:+$HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh}
 ```
 
 This line won't do anything unless `asdf` has been installed with `brew`.

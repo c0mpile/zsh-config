@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+
+eval "$_zconf_opt"
+
+zf_mkdir -p -- $ZCONF/cache/powerlevel10k/p10k-root || return
+
+if [[ $GITSTATUS_AUTO_INSTALL != 0 ]]; then
+  if [[ -e $ZCONF/.updating ]]; then
+    print -ru2 -- ${(%):-"%F{3}zconf%f: updating %Bgitstatus%b binary"}
+  else
+    print -ru2 -- ${(%):-"%F{3}zconf%f: fetching %Bgitstatus%b binary"}
+  fi
+
+  (
+    unset -m 'GITSTATUS_*~GITSTATUS_CACHE_DIR'
+    export GITSTATUS_CACHE_DIR=$GITSTATUS_CACHE_DIR
+    $ZCONF_PACKAGE_DIR/gitstatus/install -f
+  ) || return
+fi
+
+zconf compile -- $ZCONF_PACKAGE_DIR/{*.zsh-theme,internal/*.zsh,gitstatus/*.zsh,gitstatus/install}(N)

@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+
+local file
+zparseopts -D -F -- 2>/dev/null || zparseopts -D -F -- '' || return '_zconf_err()'
+emulate zsh -o extended_glob -c 'local files=(${^@}(N))'
+builtin set --
+for file in "${files[@]}"; do
+  -zconf-compile "$file"
+done

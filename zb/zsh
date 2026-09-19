@@ -1,7 +1,7 @@
 #!/bin/sh
 
-if [ -x "${_Z4H_EXE}" ]; then
-  exec "${_Z4H_EXE}" "$@"
+if [ -x "${_ZCONF_EXE}" ]; then
+  exec "${_ZCONF_EXE}" "$@"
 else
   dir="$(dirname -- "$0")"                                                    || exit
   dir="$( [ -d "$dir" ] && cd -- "$dir" && pwd )"                             || exit

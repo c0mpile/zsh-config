@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+
+local content
+local file=$ZCONF/stickycache/dir-history-$EUID
+if [[ -r $file ]] && content=$(<$file); then
+  typeset -ga _zconf_dir_history=(${(f)content})
+else
+  typeset -ga _zconf_dir_history=()
+fi

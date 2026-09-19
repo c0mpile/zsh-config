@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+
+eval "$_zconf_opt"
+
+zconf compile -- $ZCONF_PACKAGE_DIR/{zsh-syntax-highlighting.zsh,highlighters/*/*.zsh}(N)

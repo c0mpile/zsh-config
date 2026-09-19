@@ -1,0 +1,281 @@
+#!/usr/bin/env zsh
+
+[[ -v _zconf_tty_fd ]] || return
+
+[[ ! -v _zconf_compinit_fd ]] || -zconf-compinit || true
+
+[[ -o auto_menu ]] && local -i auto_menu=1 || local -i auto_menu=0
+
+setopt local_options always_to_end no_auto_list no_auto_menu no_auto_param_keys     \
+       no_auto_remove_slash no_bash_auto_list no_complete_in_word no_list_ambiguous \
+       no_list_beep no_list_packed no_list_rows_first no_menu_complete no_rec_exact
+
+local -ra _zconf_shadow_funcs=(_main_complete _multi_parts _path_files _setup compadd zstyle)
+
+local f
+for f in $_zconf_shadow_funcs; do
+  if (( ${+functions[$f]} )); then
+    builtin functions -c -- $f -zconf-orig-$f
+    local _zconf_orig_${f#_}=-zconf-orig-$f
+  else
+    eval "local -a _zconf_orig_${f#_}=(builtin $f)"
+  fi
+done
+
+# exec 3>&2 2>/tmp/log
+
+{
+  # setopt xtrace
+
+  function zstyle() {
+    # zstyle -T ":completion:${curcontext}:$_type" list-grouped
+    if [[ $# == 3 && $3 == list-grouped && $1 == -(t|T) && $2 == :completion:* ]]; then
+      return 1
+    else
+      $_zconf_orig_zstyle "$@"
+    fi
+  }
+
+  function _setup () {}
+
+  function _multi_parts() {
+    local _zconf_sep=${@[-2]}
+    local _zconf_array=${@[-1]}
+    shift -p 2
+    [[ $# != 0 && ${@[-1]} == (-|--) ]] && shift -p
+    () {
+      emulate -L zsh
+      if [[ $_zconf_array == '('* ]]; then
+        _zconf_array=(${=_zconf_array[2,-2]})
+      else
+        _zconf_array=("${(@P)_zconf_array}")
+      fi
+    }
+    # This ** is not ideal but alternatives are worse.
+    #
+    # Consider the following setup:
+    #
+    #   git init
+    #   mkdir -p foo1 foo2/bar
+    #   touch foo1/qux foo2/bar/qux
+    #   git add .
+    #   git commit --allow-empty-message -m ''
+    #   rm foo1/qux foo2/bar/qux
+    #   git commit <TAB>
+    #
+    # At this point there are two trial completions: foo1/qux and foo2/bar/qux.
+    #
+    # With ** we'll get foo/qux with the cursor after foo. Another TAB will
+    # give summon fzf to choose between the two trial completions.
+    #
+    # With a single * we'll get the same completion on the first TAB (foo/qux
+    # with the cursor after foo). Another TAB will produce foo1/qux. That's
+    # quite awful. The awfulness is expecially obvious if auto_menu is set.
+    # In this case `git commit <TAB>` will complete foo1/qux in a single go,
+    # even though there are two files to commit.
+    #
+    # The ideal behavior would be foo on the first TAB and fzf with both
+    # trial completions on the second. We can achieve this by dropping -M.
+    # However, this would not allow us to complete f/b, and we want that.
+    compadd -M "r:|${_zconf_sep}=** r:|=*" "$@" - "${_zconf_array[@]}"
+  }
+
+  function _path_files() {
+    () {
+      # TODO: respect pats and ignore somehow.
+      local -a opts files dirs pats ignore
+      zparseopts -a mopts f=files /=dirs g+:=pats F:=ignore \
+        P: S: q r: R: W:  M+: J+: V+: x+: X+: 1 2 o+: n
+      local -i patdirs=${#pats}
+      while (( ${#pats} )); do
+        if [[ ${pats[2]} != ('*(-/)'|'*(#q-/)') ]]; then
+          patdirs=0
+          break
+        fi
+        builtin shift 2 pats
+      done
+      (( patdirs )) && dirs=(-/)
+      (( ${#files} || ! ${#dirs} )) && typeset -gi _zconf_only_dirs=0
+    } "$@"
+    local -ir _zconf_in_path_files=1
+    $_zconf_orig_path_files "$@"
+  }
+
+  function compadd() {
+    local -a _zconf_{opts,nDOA,q,f,s,S,I,W,i,P,p,d,r,R,e,U}
+    zparseopts -E -a _zconf_opts {D,O,A}+:=_zconf_nDOA n+=_zconf_nDOA \
+      f+=_zconf_f s+:=_zconf_s S+:=_zconf_S I+:=_zconf_I W+:=_zconf_W     \
+      i+:=_zconf_i P+:=_zconf_P p+:=_zconf_p d+:=_zconf_d q+=_zconf_q     \
+      r+:=_zconf_r R+:=_zconf_R e+=_zconf_e U+=_zconf_U                 \
+      {a,k,l,1,2,C,Q}+ {F,J,X,x,V,E,M}+: o+::
+    if (( ${#_zconf_nDOA} )); then
+      $_zconf_orig_compadd "$@"
+      return
+    fi
+    local -a _zconf_A _zconf_D
+    if (( ${#_zconf_d} )); then
+      () {
+        emulate -L zsh
+        local _zconf_arr=$_zconf_d[2]
+        if [[ $_zconf_arr == '('* ]]; then
+          _zconf_D=(${=_zconf_arr[2,-2]})
+        else
+          _zconf_D=("${(@P)_zconf_arr}") 
+        fi
+      }
+    fi
+    $_zconf_orig_compadd -A _zconf_A -D _zconf_D "$@" || true
+    (( ${#_zconf_A} )) || return
+    # Many completers read $compstate[nmatches], which can be super slow if there are
+    # many matches that require deduplication. We drop everything in an unsorted
+    # group without deduplication to avoid this cost. We deduplicate everything manually
+    # at a later stage.
+    $_zconf_orig_compadd -V- -2 -o nosort -J- "$@" || return
+
+    emulate -L zsh
+    typeset -g _zconf_curcontext=$curcontext
+    if (( $#_zconf_D < $#_zconf_A )); then
+      _zconf_D+=(${_zconf_A:$#_zconf_D})
+    elif (( $#_zconf_D > $#_zconf_A )); then
+      _zconf_D[$#_zconf_A+1,-1]=()
+    fi
+    _zconf_words+=("${_zconf_A[@]}")
+    _zconf_descrs+=("${_zconf_D[@]}")
+    if (( ! $#_zconf_U )); then
+      _zconf_i=(-i "$IPREFIX$_zconf_i[2]")
+      _zconf_I=(-I "$_zconf_I[2]$ISUFFIX")
+    fi
+    local scaffold=(
+      "$_zconf_in_path_files"
+      "$_zconf_P[2]" "$_zconf_S[2]" "$_zconf_p[2]" "$_zconf_s[2]" "$_zconf_i[2]" "$_zconf_I[2]"
+      "$_zconf_q[1]" "$_zconf_r[2]" "$_zconf_R[2]" "$_zconf_f[1]" "$_zconf_e[1]" "$_zconf_W[2]"
+      "$PREFIX" "$SUFFIX")
+    scaffold=${(pj:\1:)scaffold}
+    if (( ! $#_zconf_scaffolds )); then
+      _zconf_scaffolds=($scaffold)
+      if [[ $IPREFIX$PREFIX == $_zconf_i[2]$_zconf_P[2]$_zconf_p[2]* ]]; then
+        _zconf_word_prefix=${${:-$IPREFIX$PREFIX}#$_zconf_i[2]$_zconf_P[2]$_zconf_p[2]}
+      fi
+    elif (( $#_zconf_scaffolds > 1 )) || [[ $_zconf_scaffolds[1] != $scaffold ]]; then
+      repeat $(( $#_zconf_words - $#_zconf_scaffolds - $#_zconf_A )); do
+        _zconf_scaffolds+=($_zconf_scaffolds[1])
+      done
+      repeat $#_zconf_A _zconf_scaffolds+=($scaffold)
+    fi
+  }
+
+  -zconf-cursor-hide
+
+  local ZLE_REMOVE_SUFFIX_CHARS ZLE_SPACE_SUFFIX_CHARS
+  unset ZLE_REMOVE_SUFFIX_CHARS ZLE_SPACE_SUFFIX_CHARS
+
+  local -i again=1
+  while (( again )); do
+    {
+      -zconf-show-dots $LBUFFER
+
+      local buf=$BUFFER
+      local -i cursor=CURSOR
+      
+      local -a _zconf_words=()
+      local -a _zconf_descrs=()
+      local -a _zconf_scaffolds=()
+      local -i _zconf_only_dirs=1
+      local -i _zconf_in_path_files=0
+      local -i _zconf_in_quotes=0
+      local _zconf_curcontext=
+      local _zconf_word_prefix=
+
+      functions -c -- -zconf-main-complete _main_complete
+      builtin zle expand-or-complete
+      if [[ $buf == $BUFFER && $cursor == $CURSOR ]]; then
+        (( ${#_zconf_words} )) || return 0
+        local _zconf_path_prefix=
+        if () {
+                emulate -L zsh
+                (( $#_zconf_scaffolds == 1 && !_zconf_in_quotes )) || return
+                local -a s=("${(@ps:\1:)_zconf_scaffolds}")
+                [[ $s[1] == 1 && -z $s[3] && -z $s[5] && -z $s[7] && -n $s[11] &&
+                  $s[13] == (|*/) && -z $s[15] ]] || return
+                typeset -g _zconf_path_prefix=$s[13]
+              }; then
+          local -a _zconf_reply=()
+          if builtin zstyle -t ":completion:${_zconf_curcontext}:default" sort; then
+            _zconf_words=("${(@ou)_zconf_words}")
+          else
+            _zconf_words=("${(@u)_zconf_words}")
+          fi
+          -zconf-sanitize-word-prefix "${_zconf_words[@]}"
+          -zconf-comp-files || return
+          () {
+            emulate -L zsh
+            again=${_zconf_reply[1]}
+            _zconf_words=("${(@q)_zconf_reply:1}")
+          }
+          -zconf-insert-all || return
+        else
+          local -a _zconf_reply=()
+          local nl=$'\n'
+          _zconf_descrs=("${(@)_zconf_descrs//$nl/\\n}")
+          -zconf-sanitize-word-prefix "${_zconf_descrs[@]}"
+          -zconf-comp-words || return
+          () {
+            emulate -L zsh
+            again=${_zconf_reply[1]}
+            local -i idx=0
+            local words=()
+            if (( ${#_zconf_scaffolds} == 1 )); then
+              for idx in "${(@)_zconf_reply:1}"; do
+                words+=("${_zconf_words[idx]}")
+              done
+            else
+            local scaffolds=()
+              for idx in "${(@)_zconf_reply:1}"; do
+                words+=("${_zconf_words[idx]}")
+                scaffolds+=("${_zconf_scaffolds[idx]}")
+              done
+              _zconf_scaffolds=("${scaffolds[@]}")
+            fi
+            _zconf_words=("${words[@]}")
+          }
+          -zconf-insert-all || return
+        fi
+      else
+        if (( auto_menu )); then
+          _zconf_words=("${(@ou)_zconf_words}")
+          again=$((${#_zconf_words} > 1))
+        else
+          again=0
+        fi
+      fi
+
+      if [[ $LBUFFER == *' ' && $RBUFFER == ' '* ]]; then
+        RBUFFER[1]=
+      else
+        BUFFER=$BUFFER
+      fi
+
+      [[ $BUFFER == $buf && $CURSOR == $cursor ]] && return
+      builtin zle .split-undo || return
+      [[ $LBUFFER == *' ' ]] && return
+    } always {
+      if (( _zconf_use[zsh-autosuggestions] || _zconf_use[zsh-syntax-highlighting] )); then
+        -zconf-redraw-buffer
+      fi
+    }
+  done
+} always {
+  # unsetopt xtrace
+  # exec 2>&3 3>&-
+  local f=
+  for f in $_zconf_shadow_funcs; do
+    if (( ${+functions[-zconf-orig-$f]} )); then
+      builtin functions -c -- -zconf-orig-$f $f
+      builtin unfunction -- -zconf-orig-$f
+    elif (( ${+functions[$f]} )); then
+      builtin unfunction -- $f
+    fi
+  done
+  builtin zle -R
+  -zconf-cursor-show
+}

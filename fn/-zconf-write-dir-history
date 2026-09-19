@@ -1,0 +1,6 @@
+#!/usr/bin/env zsh
+
+local file=$ZCONF/stickycache/dir-history-$EUID
+local tmp=$file.tmp.$$
+print -rC1 -- $_zconf_dir_history >$tmp
+zf_mv -f -- $tmp $file

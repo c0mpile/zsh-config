@@ -1,0 +1,11 @@
+#!/usr/bin/env zsh
+
+(( ${+_zconf_dir_hist_fd} )) && -zconf-update-dir-history
+
+() {
+  eval "$_zconf_opt"
+  while (( $#dirstack )) && ! pushd -q $1 &>/dev/null; do
+    popd -q $1
+  done
+  (( $#dirstack ))
+} "$@" && -zconf-redraw-prompt

@@ -1,0 +1,14 @@
+#!/usr/bin/env zsh
+
+zconf compile -- $ZCONF/zsh4humans/{main.zsh,sc/exec-zsh-i,fn/(|-|_)zconf[^.]#~*.zwc} $ZCONF/zconf.zsh || return
+
+[[ -v functions[compinit] ]] && unfunction compinit
+autoload -Uz +X compinit || return
+local orig="bindkey '^i' | IFS=\$' \t' read -A _i_line"
+local replacement="_i_line=( '\"^I\"' zconf-fzf-complete )"
+print -r -- ${functions[compinit]/$orig/$replacement} >$ZCONF/zsh4humans/fn/tmp.$$.compinit || return
+zf_mv -- $ZCONF/zsh4humans/fn/tmp.$$.compinit $ZCONF/zsh4humans/fn/-zconf-compinit-impl || return
+zconf compile -- $ZCONF/zsh4humans/fn/-zconf-compinit-impl || return
+autoload -Uz -- -zconf-compinit-impl
+
+function compinit() {}

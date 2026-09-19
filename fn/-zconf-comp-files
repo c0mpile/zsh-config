@@ -1,0 +1,148 @@
+#!/usr/bin/env zsh
+
+()  {
+  eval "$_zconf_opt"
+
+  local -i dot_glob list_types
+  [[ $1 == on ]] && dot_glob=1
+  [[ $2 == on ]] && list_types=1
+
+  if (( _zconf_only_dirs )); then
+    local dirs=($_zconf_path_prefix${^${(Q)_zconf_words}}/*(D-/Y1N:h:t))
+  else
+    local dirs=($_zconf_path_prefix${^${(Q)_zconf_words}}/*(DY1N:h:t))
+  fi
+
+  -zconf-set-list-colors "$_zconf_curcontext" "$list_types"
+  local -i list_colors=$((!$?))
+
+  autoload +X -Uz -- -zconf-present-files -zconf-cursor-show -zconf-find -zconf-fzf
+
+  local -i pct=60
+  (( _zconf_can_save_restore_screen )) && pct=100
+
+  local -i recurse
+  () {
+    emulate -L zsh
+    # Set curcontext and dot_glob in case the value of recurse depends on them (via `zstyle -e`).
+    # Ideally we should run this with user options.
+    (( dot_glob )) && setopt dot_glob
+    local curcontext=$_zconf_curcontext
+    zstyle -T :zconf:${WIDGET#zconf-} recurse-dirs && recurse=1
+  }
+
+  local -i height=$(( ! (recurse && $#dirs) && 100 * ($#_zconf_words + 4) < pct * LINES ? $#_zconf_words + 4 : pct * LINES / 100 ))
+
+  (( height >= 6 )) || (( height = 6 ))
+  (( height <= LINES - 1 )) || (( height = LINES - 1 ))
+
+  local opts=(
+    --query=${_zconf_word_prefix:+"^$_zconf_word_prefix"}
+    --color=hl:201,hl+:201
+    --with-nth=2
+    --delimiter='\000'
+    --ansi
+    --exact
+    --no-mouse
+    --tiebreak=length,begin,index
+    --multi
+    --cycle
+    --border=horizontal
+  )
+
+  () {
+    emulate -L zsh
+    # Set dot_glob in case the value of find-flags depends on it (via `zstyle -e`).
+    # Ideally we should run this with user options.
+    (( dot_glob )) && setopt dot_glob
+    local -a bin
+    zstyle -a :zconf:${WIDGET#zconf-} find-command bin
+    if (( ! $#bin )) && (( $+commands[bfs] )); then
+      opts+=(--no-sort)
+    fi
+  }
+
+  local cursor_y cursor_x
+  -zconf-get-cursor-pos || return
+
+  if (( _zconf_can_save_restore_screen )); then
+    opts+=(--no-clear)
+    if { (( height <= cursor_y - 1 )) && zstyle -T :zconf: prompt-at-bottom } ||
+       (( cursor_y - 1 > LINES - cursor_y && cursor_y - 1 > 6 )) &&
+       { (( height > LINES - cursor_y )) || zstyle -T :zconf: prompt-at-bottom }; then
+      (( height <= cursor_y - 1 )) || (( height = cursor_y - 1 ))
+      local move=$'\e[0m\e['$((cursor_y-height))';1H'
+      opts+=(--layout=default)
+    elif (( LINES - cursor_y > 6 )); then
+      (( height <= LINES - cursor_y )) || (( height = LINES - cursor_y ))
+      local move=$'\e[0m\n\r'
+      opts+=(--layout=reverse)
+    else
+      local -i extra=$((height - LINES + cursor_y))
+      print -rnu $_zconf_tty_fd -- ${(pl:$height::\n:)} || return
+      (( cursor_y += LINES - cursor_y - height ))
+      local move=$'\e[0m\e['$((cursor_y+1))';1H'
+      opts+=(--layout=reverse)
+    fi
+    local _zconf_saved_screen
+    -zconf-save-screen || return
+  else
+    print -u $_zconf_tty_fd || return
+    local move=
+    opts+=(--layout=reverse)
+  fi
+
+  opts+=(--height=$height)
+
+  {
+    local choice
+    choice="$(
+      unsetopt pipe_fail
+      exec 2>/dev/null
+      [[ -n $_zconf_path_prefix ]] && builtin cd -q -- $_zconf_path_prefix
+      {
+        print -r -- $sysparams[pid]
+        print -lr -- ${(Q)_zconf_words}
+        if (( recurse )); then
+          # Set curcontext to support this:
+          #
+          #   zstyle -e :zconf:fzf-complete find-flags my-find-flags
+          #
+          #   function my-find-flags() {
+          #     if [[ $curcontext == :complete:cd:* ]]; then
+          #       reply=(...)
+          #     fi
+          #   }
+          local curcontext=$_zconf_curcontext
+          -zconf-find $dot_glob $_zconf_only_dirs $dirs | command sed -n '/\/.*\// s/^..//p'
+        fi
+      } | {
+        local -a pids
+        IFS=' ' builtin read -rA pids || exit
+        print -r -- $pids $sysparams[pid] || exit
+        -zconf-present-files $list_colors $list_types 0
+      } | {
+        local -a pids
+        IFS=' ' builtin read -rA pids || pids=()
+        print -rnu $_zconf_tty_fd -- $move
+        -zconf-cursor-show
+        2>&$_zconf_tty_fd -zconf-fzf $opts
+        (( $#pids )) && builtin kill -- $pids
+      }
+    )"
+  } always {
+    -zconf-cursor-hide
+    if (( _zconf_can_save_restore_screen )); then
+      -zconf-restore-screen
+      print -rn -- $'\e[0m\e['$cursor_y';'$cursor_x'H'
+    else
+      builtin echoti cuu 1
+      (( cursor_x > 1 )) && builtin echoti cuf $((cursor_x-1))
+    fi
+  }
+
+  [[ -n $choice ]] || return
+  choice=("${(@f)choice}")
+  typeset -g _zconf_reply=(0 ${${choice:1}%$'\0'*})
+  [[ -z $choice[1] ]] || _zconf_reply[1]=1
+} "${options[dot_glob]}" "${options[list_types]}"

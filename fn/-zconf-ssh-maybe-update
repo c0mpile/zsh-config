@@ -1,0 +1,18 @@
+#!/usr/bin/env zsh
+
+# Requires: [[ $ZCONF_SSH == <1->:* ]]
+
+eval "$_zconf_opt"
+
+local min_version=${ZCONF_SSH%%:*}
+
+local got_version
+got_version=${$(<$ZCONF/zsh4humans/version)%$'\r'} &&
+  [[ $got_version == <-> ]]                      &&
+  (( got_version >= min_version ))               &&
+  return
+
+print -Pru2 -- "%F{3}zconf%f: %Binitiating update%b (cached version too old)"
+
+ZCONF_SSH=0:${ZCONF_SSH#*:}
+-zconf-cmd-update

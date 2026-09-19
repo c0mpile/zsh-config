@@ -7,85 +7,85 @@
   ```zsh
   # When fzf menu opens on TAB, another TAB moves the cursor down ('tab:down')
   # or accepts the selection and triggers another TAB-completion ('tab:repeat')?
-  zstyle ':z4h:fzf-complete'    fzf-bindings     'tab:down'
+  zstyle ':zconf:fzf-complete'    fzf-bindings     'tab:down'
   # When fzf menu opens on Alt+Down, TAB moves the cursor down ('tab:down')
   # or accepts the selection and triggers another Alt+Down ('tab:repeat')?
-  zstyle ':z4h:cd-down'         fzf-bindings     'tab:down'
+  zstyle ':zconf:cd-down'         fzf-bindings     'tab:down'
   ```
 - FreeBSD is no longer supported.
-- `zstyle ':z4h:...' passthrough` has been replaced with `zstyle ':z4h:...' enable` that has the
+- `zstyle ':zconf:...' passthrough` has been replaced with `zstyle ':zconf:...' enable` that has the
   opposite meaning. The default value is `no`. If your `~/.zshrc` mentions `passthrough`, you need
   to change those styles. Here's how it looks in the default `.zshrc` now:
   ```zsh
-  # Enable ('yes') or disable ('no') automatic teleportation of z4h over
+  # Enable ('yes') or disable ('no') automatic teleportation of zconf over
   # ssh when connecting to these hosts.
-  zstyle ':z4h:ssh:example-hostname1'   enable 'yes'
-  zstyle ':z4h:ssh:*.example-hostname2' enable 'no'
+  zstyle ':zconf:ssh:example-hostname1'   enable 'yes'
+  zstyle ':zconf:ssh:*.example-hostname2' enable 'no'
   # The default value if none of the overrides above match the hostname.
-  zstyle ':z4h:ssh:*'                   enable 'no'
+  zstyle ':zconf:ssh:*'                   enable 'no'
   ```
-- Function `ssh` has been moved from `.zshrc` to z4h proper. If your `.zshrc` defines it, you need
+- Function `ssh` has been moved from `.zshrc` to zconf proper. If your `.zshrc` defines it, you need
   to remove it.
-- When connecting over ssh to a host for which `zstyle ':z4h:ssh:...' enable` is set to 'no', `TERM`
+- When connecting over ssh to a host for which `zstyle ':zconf:ssh:...' enable` is set to 'no', `TERM`
   value of `tmux-256color` gets replaced with `screen-256color`. This can be customized with
-  `zstyle ':z4h:ssh:...' term`.
-- New option to disable preview in `z4h-fzf-history`:
+  `zstyle ':zconf:ssh:...' term`.
+- New option to disable preview in `zconf-fzf-history`:
   ```zsh
-  zstyle :z4h:fzf-history fzf-preview no
+  zstyle :zconf:fzf-history fzf-preview no
   ```
 - iTerm2 integration can no longer be enabled by sourcing `~/.iterm2_shell_integration.zsh`.
   Instead, you need to put this line in `~/.zshrc`:
   ```zsh
-  zstyle ':z4h:' iterm2-integration 'yes'
+  zstyle ':zconf:' iterm2-integration 'yes'
   ```
 - The following bindings have been changed:
-  - <kbd>Ctrl+P</kbd>/<kbd>Up</kbd>: `z4h-up-local-history` => `z4h-up-substring-local`
-  - <kbd>Ctrl+N</kbd>/<kbd>Down</kbd>: `z4h-down-local-history` => `z4h-down-substring-local`
+  - <kbd>Ctrl+P</kbd>/<kbd>Up</kbd>: `zconf-up-local-history` => `zconf-up-substring-local`
+  - <kbd>Ctrl+N</kbd>/<kbd>Down</kbd>: `zconf-down-local-history` => `zconf-down-substring-local`
 - The following widgets have been renamed:
-  - `z4h-up-local-history` => `z4h-up-prefix-local`
-  - `z4h-down-local-history` => `z4h-down-prefix-local`
-  - `z4h-up-global-history` => `z4h-up-prefix-global`
-  - `z4h-down-global-history` => `z4h-down-prefix-global`
+  - `zconf-up-local-history` => `zconf-up-prefix-local`
+  - `zconf-down-local-history` => `zconf-down-prefix-local`
+  - `zconf-up-global-history` => `zconf-up-prefix-global`
+  - `zconf-down-global-history` => `zconf-down-prefix-global`
 - It's now possible to automatically start `tmux` when zsh4humans is initializing.
   ```zsh
-  zstyle :z4h: start-tmux [arg]...
+  zstyle :zconf: start-tmux [arg]...
   ```
   Where `[arg]...` is either `integrated` (the default), `no`, `command <cmd> [flag]...`, or
   `system`. The latter is equivalent to `command tmux -u`.
-- Widgets the perform recursive directory traversal (`z4h-cd-down` and `z4h-fzf-complete`) now
+- Widgets the perform recursive directory traversal (`zconf-cd-down` and `zconf-fzf-complete`) now
   use [bfs](https://github.com/tavianator/bfs) instead of `find` if it's installed. You can get
   the original behavior with the following declaration:
   ```zsh
-  zstyle ':z4h:(cd-down|fzf-complete)' find-command command find
+  zstyle ':zconf:(cd-down|fzf-complete)' find-command command find
   ```
   You can also use a custom function in place of `command find` if you want to transform command
   line arguments.
-- `z4h-fzf-history` (<kbd>Ctrl+R</kbd>) now uses `BUFFER` instead of `LBUFFER` for the initial
+- `zconf-fzf-history` (<kbd>Ctrl+R</kbd>) now uses `BUFFER` instead of `LBUFFER` for the initial
   query. This makes a difference only when the widget is invoked when the cursor is not at the very
   end of the command line.
-- All `z4h-kill-*` and `z4h-backward-kill-*` widgets now add the killed region to the kill ring.
-- `z4h install` now allows specifying the branch explicitly: `z4h install user/repo@branch`.
+- All `zconf-kill-*` and `zconf-backward-kill-*` widgets now add the killed region to the kill ring.
+- `zconf install` now allows specifying the branch explicitly: `zconf install user/repo@branch`.
 - If `brew` is installed, zsh4humans now automatically installs `homebrew/command-not-found`.
 - `command_not_found_handler` now uses `homebrew/command-not-found` if it's available.
-- Auto-update is now disabled by default. It is recommended to use `z4h update` to update
+- Auto-update is now disabled by default. It is recommended to use `zconf update` to update
   manually.
 - Recursive file completions can now be disabled:
   ```zsh
-  zstyle ':z4h:fzf-complete' recurse-dirs 'no'
+  zstyle ':zconf:fzf-complete' recurse-dirs 'no'
   ```
 - It's now possible to contract prompt on <kbd>Ctrl+D</kbd> when using Transient Prompt.
   ```zsh
-  z4h bindkey z4h-eof Ctrl+D
+  zconf bindkey zconf-eof Ctrl+D
   setopt ignore_eof
   ```
 - There is now builtin integration with [direnv](https://github.com/direnv/direnv). It is much
-  faster than the stock one and works well with all z4h features. Specifically:
+  faster than the stock one and works well with all zconf features. Specifically:
 
   - If there is `.envrc` in the current or ancestor directory when starting
     zsh, it gets ingested before instant prompt.
   - Messages from direnv are displayed not only if you execute `cd foo`
     but also when you change the current directory with one of the
-    specialized z4h widgets (`z4h-cd-up`, `z4h-cd-back`, etc.).
+    specialized zconf widgets (`zconf-cd-up`, `zconf-cd-back`, etc.).
   - "Loading" and "unloading" notifications from direnv can be suppressed.
 
   Note that powerlevel10k has a prompt segment for direnv. It shows an icon
@@ -95,12 +95,12 @@
 
   Enable direnv integration:
   ```zsh
-  zstyle ':z4h:direnv' enable 'yes'
+  zstyle ':zconf:direnv' enable 'yes'
   ```
 
   Disable "loading" and "unloading" notifications from direnv:
   ```zsh
-  zstyle ':z4h:direnv:success' notify 'no'
+  zstyle ':zconf:direnv:success' notify 'no'
   ```
 
   If you enable direnv integration in this way, the stock integration won't
@@ -120,4 +120,4 @@
   emulate zsh -c "$(direnv export zsh)"
   emulate zsh -c "$(direnv hook zsh)"
   ```
-- New zle widget: `z4h-quote-prev-zword`.
+- New zle widget: `zconf-quote-prev-zword`.

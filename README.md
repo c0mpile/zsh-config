@@ -52,9 +52,9 @@ Run this command in bash, zsh, or sh:
 
 ```shell
 if command -v curl >/dev/null 2>&1; then
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/romkatv/zsh4humans/v5/install)"
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/c0mpile/zsh-config/v5/install)"
 else
-  sh -c "$(wget -O- https://raw.githubusercontent.com/romkatv/zsh4humans/v5/install)"
+  sh -c "$(wget -O- https://raw.githubusercontent.com/c0mpile/zsh-config/v5/install)"
 fi
 ```
 
@@ -67,7 +67,7 @@ confirmation on every step so that you are always in control. Installation requi
   <summary>Recording of the installation process</summary>
 
   ![Zsh for Humans installation](
-    https://github.com/romkatv/powerlevel10k-media/raw/32c7d40239c93507277f14522be90b5750f442c9/z4h-install.gif)
+    https://github.com/romkatv/powerlevel10k-media/raw/32c7d40239c93507277f14522be90b5750f442c9/zconf-install.gif)
 
 </details>
 
@@ -80,14 +80,14 @@ changes to the file system. Once you exit Zsh, the image is deleted.
   ```zsh
   docker run -e TERM -e COLORTERM -e LC_ALL=C.UTF-8 -w /root -it --detach-keys="ctrl-^,ctrl-@" --rm alpine sh -uec '
     apk add zsh curl tmux
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/romkatv/zsh4humans/v5/install)"'
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/c0mpile/zsh-config/v5/install)"'
   ```
 - **Ubuntu**: install additional software with `apt install <package>`:
   ```zsh
   docker run -e TERM -e COLORTERM -w /root -it --detach-keys="ctrl-^,ctrl-@" --rm ubuntu sh -uec '
     apt-get update
     apt-get install -y zsh curl tmux
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/romkatv/zsh4humans/v5/install)"'
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/c0mpile/zsh-config/v5/install)"'
   ```
 
 ## Caveats
@@ -250,7 +250,7 @@ create these files** unless you are absolutely certain you need them.
 
 ## Updating
 
-Run `z4h update` to update Zsh for Humans. There is no update mechanism for `~/.zshrc` itself.
+Run `zconf update` to update Zsh for Humans. There is no update mechanism for `~/.zshrc` itself.
 
 ## Uninstalling
 

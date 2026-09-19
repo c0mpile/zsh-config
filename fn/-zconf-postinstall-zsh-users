@@ -1,0 +1,19 @@
+#!/usr/bin/env zsh
+
+eval "$_zconf_opt"
+
+local file=$ZCONF_PACKAGE_DIR/${ZCONF_PACKAGE_NAME:t}.zsh
+[[ -e $file ]] || return 0
+
+local code
+code=$(<$file) || return
+
+local orig='
+
+'
+local sub='
+
+[[ -n ${ZSH_SCRIPT+X}${ZSH_EXECUTION_STRING+X} ]] && return
+
+'
+print -r -- ${code/$orig/$sub} >$file

@@ -1,0 +1,14 @@
+#!/usr/bin/env zsh
+
+eval "$_zconf_opt"
+
+[[ -v _zconf_tty_fd ]] || return
+
+if [[ -n $_ZCONF_TMUX ]]; then
+  (( ${+_zconf_saved_screen} )) || return
+  print -rnu $_zconf_tty_fd -- "$_zconf_saved_screen"
+elif [[ -n $ZCONF_SSH && -n $_ZCONF_SSH_MARKER ]]; then
+  printf '\001zconf.%s%s' "$_ZCONF_SSH_MARKER" 'restore-screen  ' >&$_zconf_tty_fd
+else
+  return 1
+fi

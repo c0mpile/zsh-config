@@ -1,0 +1,26 @@
+#!/usr/bin/env zsh
+
+local -i ret
+
+if [[ -v widgets[-zconf-orig-zle-line-finish] ]]; then
+  zle -- -zconf-orig-zle-line-finish "$@" || ret=$?
+fi
+
+if [[ -v _zconf_redraw_fd ]]; then
+  zle -F "$_zconf_redraw_fd"
+  exec {_zconf_redraw_fd}>&-
+  unset _zconf_redraw_fd
+fi
+
+if [[ $BUFFER == *' ' ]] &&
+   ! zstyle -t :zconf:history preserve-trailing-whitespace &&
+   -zconf-is-valid-list "$PREBUFFER$BUFFER"; then
+  BUFFER=${BUFFER%% #}
+fi
+
+unset POSTDISPLAY _zconf_autosuggest_buffer _zconf_autosuggestion
+if [[ -v region_highlight ]]; then
+  _zsh_highlight
+fi
+
+return ret

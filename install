@@ -19,7 +19,7 @@ case "$platform" in
   'linux x86_64');;
   'linux i686');;
   *)
-    >&2 'printf' '\033[33mz4h\033[0m: sorry, unsupported platform: \033[31m%s\033[0m\n' "$platform"
+    >&2 'printf' '\033[33mzconf\033[0m: sorry, unsupported platform: \033[31m%s\033[0m\n' "$platform"
     'exit' '1'
   ;;
 esac
@@ -29,12 +29,12 @@ if command -v 'curl' >'/dev/null' 2>&1; then
 elif command -v 'wget' >'/dev/null' 2>&1; then
   fetch='command wget -O'
 else
-  >&2 'printf' '\033[33mz4h\033[0m: please install \033[32mcurl\033[0m or \033[32mwget\033[0m\n'
+  >&2 'printf' '\033[33mzconf\033[0m: please install \033[32mcurl\033[0m or \033[32mwget\033[0m\n'
   'exit' '1'
 fi
 
 if '[' '!' '-d' "${HOME-}" ']'; then
-  >&2 'printf' '\033[33mz4h\033[0m: \033[1m$HOME\033[0m is not a directory\n'
+  >&2 'printf' '\033[33mzconf\033[0m: \033[1m$HOME\033[0m is not a directory\n'
   'exit' '1'
 fi
 
@@ -43,23 +43,23 @@ if '[' "$euid" '=' '0' ']'; then
   home_ls="$('command' 'ls' '-ld' '--' "$HOME")"
   home_owner="$('printf' '%s\n' "$home_ls" | 'command' 'awk' 'NR==1 {print $3}')"
   if '[' "$home_owner" '!=' 'root' ']'; then
-    >&2 'printf' '\033[33mz4h\033[0m: please retry without \033[4;32msudo\033[0m\n'
+    >&2 'printf' '\033[33mzconf\033[0m: please retry without \033[4;32msudo\033[0m\n'
     'exit' '1'
   fi
 fi
 
 if '[' '!' '-t' '0' ']'; then
-  >&2 'printf' '\033[33mz4h\033[0m: standard input is not a \033[1mTTY\033[0m\n'
+  >&2 'printf' '\033[33mzconf\033[0m: standard input is not a \033[1mTTY\033[0m\n'
   'exit' '1'
 fi
 
 if '[' '!' '-t' '1' ']'; then
-  >&2 'printf' '\033[33mz4h\033[0m: standard output is not a \033[1mTTY\033[0m\n'
+  >&2 'printf' '\033[33mzconf\033[0m: standard output is not a \033[1mTTY\033[0m\n'
   'exit' '1'
 fi
 
 if '[' '!' '-t' '2' ']'; then
-  >&2 'printf' '\033[33mz4h\033[0m: standard error is not a \033[1mTTY\033[0m\n'
+  >&2 'printf' '\033[33mzconf\033[0m: standard error is not a \033[1mTTY\033[0m\n'
   'exit' '1'
 fi
 
@@ -67,11 +67,11 @@ saved_tty_settings="$('command' 'stty' '-g')"
 
 zshenv=''
 zshrc=''
-z4h=''
+zconf=''
 
 cleanup() {
   'trap' '-' 'INT' 'TERM' 'EXIT'
-  'command' 'rm' '-f' '--' "$zshenv" "$zshrc" "${zshrc:+$zshrc.bak}" "$z4h"
+  'command' 'rm' '-f' '--' "$zshenv" "$zshrc" "${zshrc:+$zshrc.bak}" "$zconf"
   'command' 'stty' "$saved_tty_settings"
 }
 
@@ -121,7 +121,7 @@ while 'true'; do
     "$lf")
     ;;
     *)
-      >&2 'printf' '\033[33mz4h\033[0m: invalid choice: \033[31m%s\033[0m\n' "$choice"
+      >&2 'printf' '\033[33mzconf\033[0m: invalid choice: \033[31m%s\033[0m\n' "$choice"
     ;;
   esac
 done
@@ -152,7 +152,7 @@ while 'true'; do
     "$lf")
     ;;
     *)
-      >&2 'printf' '\033[33mz4h\033[0m: invalid choice: \033[31m%s\033[0m\n' "$choice"
+      >&2 'printf' '\033[33mzconf\033[0m: invalid choice: \033[31m%s\033[0m\n' "$choice"
     ;;
   esac
 done
@@ -182,7 +182,7 @@ while 'true'; do
     "$lf")
     ;;
     *)
-      >&2 'printf' '\033[33mz4h\033[0m: invalid choice: \033[31m%s\033[0m\n' "$choice"
+      >&2 'printf' '\033[33mzconf\033[0m: invalid choice: \033[31m%s\033[0m\n' "$choice"
     ;;
   esac
 done
@@ -212,7 +212,7 @@ while 'true'; do
     "$lf")
     ;;
     *)
-      >&2 'printf' '\033[33mz4h\033[0m: invalid choice: \033[31m%s\033[0m\n' "$choice"
+      >&2 'printf' '\033[33mzconf\033[0m: invalid choice: \033[31m%s\033[0m\n' "$choice"
     ;;
   esac
 done
@@ -274,7 +274,7 @@ if '[' '-n' "$rcs" ']'; then
       "$lf")
       ;;
       *)
-        >&2 'printf' '\033[33mz4h\033[0m: invalid choice: \033[31m%s\033[0m\n' "$choice"
+        >&2 'printf' '\033[33mzconf\033[0m: invalid choice: \033[31m%s\033[0m\n' "$choice"
       ;;
     esac
   done
@@ -284,45 +284,45 @@ fi
 if command -v 'mktemp' >'/dev/null' 2>&1; then
   zshenv="$('command' 'mktemp' "$HOME"/.zshenv.XXXXXXXXXX)"
   zshrc="$('command' 'mktemp' "$HOME"/.zshrc.XXXXXXXXXX)"
-  z4h="$('command' 'mktemp' "$HOME"/.z4h.XXXXXXXXXX)"
+  zconf="$('command' 'mktemp' "$HOME"/.zconf.XXXXXXXXXX)"
 else
   zshenv="$HOME"/.zshenv.tmp."$$"
   zshrc="$HOME"/.zshrc.tmp."$$"
-  z4h="$HOME"/.z4h.tmp."$$"
+  zconf="$HOME"/.zconf.tmp."$$"
 fi
 
-url='https://raw.githubusercontent.com/romkatv/zsh4humans/v5'
+url='https://raw.githubusercontent.com/c0mpile/zsh-config/v5'
 
 >&2 'printf' '\n'
 >&2 'printf' 'Settings up \033[33mZsh For Humans\033[0m...\n'
 >&2 'printf' '\n'
 
->&2 printf '\033[33mz4h\033[0m: fetching \033[4mz4h.zsh\033[0m from \033[1mgithub.com/romkatv/zsh4humans\033[0m\n'
-if ! err="$($fetch "$z4h" '--' "$url"/z4h.zsh 2>&1)"; then
+>&2 printf '\033[33mzconf\033[0m: fetching \033[4mzconf.zsh\033[0m from \033[1mgithub.com/c0mpile/zsh-config\033[0m\n'
+if ! err="$($fetch "$zconf" '--' "$url"/zconf.zsh 2>&1)"; then
   >&2 'printf' "%s\n" "$err"
-  >&2 'printf' '\033[33mz4h\033[0m: failed to download \033[31m%s\033[0m\n' "$url"/z4h.zsh
-  'command' 'rm' '-rf' '--' "$z4h" 2>'/dev/null'
+  >&2 'printf' '\033[33mzconf\033[0m: failed to download \033[31m%s\033[0m\n' "$url"/zconf.zsh
+  'command' 'rm' '-rf' '--' "$zconf" 2>'/dev/null'
   'exit' '1'
 fi
 
->&2 'printf' '\033[33mz4h\033[0m: generating \033[4m~/.zshenv\033[0m\n'
+>&2 'printf' '\033[33mzconf\033[0m: generating \033[4m~/.zshenv\033[0m\n'
 if ! err="$($fetch "$zshenv" '--' "$url"/.zshenv 2>&1)"; then
   >&2 'printf' "%s\n" "$err"
-  >&2 'printf' '\033[33mz4h\033[0m: failed to download \033[31m%s\033[0m\n' "$url"/.zshenv
+  >&2 'printf' '\033[33mzconf\033[0m: failed to download \033[31m%s\033[0m\n' "$url"/.zshenv
   'exit' '1'
 fi
 
->&2 'printf' '\033[33mz4h\033[0m: generating \033[4m~/.zshrc\033[0m\n'
+>&2 'printf' '\033[33mzconf\033[0m: generating \033[4m~/.zshrc\033[0m\n'
 if ! err="$($fetch "$zshrc" '--' "$url"/.zshrc"$zshrc_suffix" 2>&1)"; then
   >&2 'printf' "%s\n" "$err"
-  >&2 'printf' '\033[33mz4h\033[0m: failed to download \033[31m%s\033[0m\n' "$url"/.zshrc"$zshrc_suffix"
+  >&2 'printf' '\033[33mzconf\033[0m: failed to download \033[31m%s\033[0m\n' "$url"/.zshrc"$zshrc_suffix"
   'exit' '1'
 fi
 
 if '[' "$tmux" '=' '1' ']'; then
-  'command' 'awk' "/Mark up shell's output/ {print \"# Start tmux if not already in tmux.\"; print \"zstyle ':z4h:' start-tmux command tmux -u new -A -D -t z4h\"; print \"\"; print \"# Whether to move prompt to the bottom when zsh starts and on Ctrl+L.\"; print \"zstyle ':z4h:' prompt-at-bottom 'no'\"; print \"\"} 1" "$zshrc" >"$zshrc.bak"
+  'command' 'awk' "/Mark up shell's output/ {print \"# Start tmux if not already in tmux.\"; print \"zstyle ':zconf:' start-tmux command tmux -u new -A -D -t zconf\"; print \"\"; print \"# Whether to move prompt to the bottom when zsh starts and on Ctrl+L.\"; print \"zstyle ':zconf:' prompt-at-bottom 'no'\"; print \"\"} 1" "$zshrc" >"$zshrc.bak"
 else
-  'command' 'awk' "/Mark up shell's output/ {print \"# Don't start tmux.\"; print \"zstyle ':z4h:' start-tmux       no\"; print \"\"} 1" "$zshrc" >"$zshrc.bak"
+  'command' 'awk' "/Mark up shell's output/ {print \"# Don't start tmux.\"; print \"zstyle ':zconf:' start-tmux       no\"; print \"\"} 1" "$zshrc" >"$zshrc.bak"
 fi
 'command' 'mv' '--' "$zshrc.bak" "$zshrc"
 
@@ -332,16 +332,16 @@ if '[' "$direnv" '=' '1' ']'; then
 fi
 
 if '[' '-r' '/proc/version' ']' && 'command' 'grep' '-q' '[Mm]icrosoft' '/proc/version' 2>'/dev/null'; then
-  'command' 'awk' "/Clone additional Git repositories from GitHub/ {print \"# Start ssh-agent if it's not running yet.\"; print \"zstyle ':z4h:ssh-agent:' start yes\"; print \"\"} 1" "$zshrc" >"$zshrc.bak"
+  'command' 'awk' "/Clone additional Git repositories from GitHub/ {print \"# Start ssh-agent if it's not running yet.\"; print \"zstyle ':zconf:ssh-agent:' start yes\"; print \"\"} 1" "$zshrc" >"$zshrc.bak"
   'command' 'mv' '--' "$zshrc.bak" "$zshrc"
 fi
 
-Z4H="${XDG_CACHE_HOME:-$HOME/.cache}/zsh4humans/v5"
+ZCONF="${XDG_CACHE_HOME:-$HOME/.cache}/zsh4humans/v5"
 
 'umask' 'o-w'
 
-'command' 'rm' '-rf' '--' "$Z4H"
-'command' 'mkdir' '-p' -- "$Z4H"
+'command' 'rm' '-rf' '--' "$ZCONF"
+'command' 'mkdir' '-p' -- "$ZCONF"
 
 if '[' '-n' "$backup_dir" ']'; then
   'command' 'mkdir' '-p' '--' "$backup_dir"
@@ -354,16 +354,16 @@ fi
 
 'command' 'mv' '--' "$zshenv" ~/'.zshenv'
 'command' 'mv' '--' "$zshrc" ~/'.zshrc'
-'command' 'mv' '--' "$z4h" "$Z4H"/z4h.zsh
+'command' 'mv' '--' "$zconf" "$ZCONF"/zconf.zsh
 
-'printf' '%s\n' "$backup_dir" >"$Z4H"/welcome
+'printf' '%s\n' "$backup_dir" >"$ZCONF"/welcome
 
 'cleanup'
 
->&2 'printf' '\033[33mz4h\033[0m: bootstrapping \033[32mzsh\033[0m environment\n'
+>&2 'printf' '\033[33mzconf\033[0m: bootstrapping \033[32mzsh\033[0m environment\n'
 
 'export' ZDOTDIR="$HOME"
-Z4H_BOOTSTRAPPING='1'
+ZCONF_BOOTSTRAPPING='1'
 'set' '+ue'
 'set' '--'
 '.' ~/'.zshenv'
