@@ -225,11 +225,12 @@ for f in ~/'.zshenv' ~/'.zshenv.zwc'     \
          ~/'.zshrc' ~/'.zshrc.zwc'       \
          ~/'.zlogin' ~/'.zlogin.zwc'     \
          ~/'.zlogout' ~/'.zlogout.zwc'   \
+         "$zdotdir"/.zshenv "$zdotdir"/.zshenv.zwc     \
          "$zdotdir"/.zprofile "$zdotdir"/.zprofile.zwc \
          "$zdotdir"/.zshrc "$zdotdir"/.zshrc.zwc       \
          "$zdotdir"/.zlogin "$zdotdir"/.zlogin.zwc     \
          "$zdotdir"/.zlogout "$zdotdir"/.zlogout.zwc; do
-  if '[' '-e' "$f" ']'; then
+  if '[' '-e' "$f" ']' || '[' '-h' "$f" ']'; then
     rcs="$rcs $f"
   fi
 done
@@ -380,6 +381,9 @@ fi
 'command' 'mv' '--' "$zshenv" ~/'.zshenv'
 'command' 'mv' '--' "$zshrc" "$zdotdir"/.zshrc
 'command' 'mv' '--' "$zconf" "$ZCONF"/zconf.zsh
+if [ "$zdotdir" '!=' "$HOME" ]; then
+  'command' 'ln' '-sf' '--' "$HOME"/.zshenv "$zdotdir"/.zshenv
+fi
 
 'printf' '%s\n' "$backup_dir" >"$ZCONF"/welcome
 

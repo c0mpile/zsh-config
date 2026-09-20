@@ -16,6 +16,9 @@ if [ -n "${ZSH_VERSION-}" ]; then
 
   : "${ZDOTDIR:=${XDG_CONFIG_HOME:-$HOME/.config}/zsh}"
   export ZDOTDIR
+  if [ "$ZDOTDIR" != "$HOME" ] && [ ! -e "$ZDOTDIR"/.zshenv ] && [ ! -h "$ZDOTDIR"/.zshenv ]; then
+    ln -sf -- "$HOME"/.zshenv "$ZDOTDIR"/.zshenv 2>/dev/null || true
+  fi
   setopt no_global_rcs
   [[ -o no_interactive && -z "${ZCONF_BOOTSTRAPPING-}" ]] && return
   setopt no_rcs
