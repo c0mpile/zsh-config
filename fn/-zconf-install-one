@@ -7,7 +7,10 @@ if [[ $1 == */* ]]; then
     url=https://github.com/${1%%@*}/archive/${1#*@}.tar.gz
     1=${1%%@*}
   else
-    url=https://github.com/$1/archive/master.tar.gz
+    case $1 in
+      systemd/systemd) url=https://github.com/systemd/systemd/archive/main.tar.gz;;
+      *)               url=https://github.com/$1/archive/master.tar.gz;;
+    esac
   fi
   if ! zstyle -s :zconf:$1 postinstall postinstall; then
     case $1 in
@@ -26,6 +29,18 @@ if [[ $1 == */* ]]; then
       zsh-users/(zsh-syntax-highlighting|zsh-autosuggestions|zsh-history-substring-search))
         postinstall=-zconf-postinstall-zsh-users
       ;;
+      junegunn/fzf)
+        postinstall=-zconf-postinstall-fzf
+      ;;
+      romkatv/powerlevel10k)
+        postinstall=-zconf-postinstall-powerlevel10k
+      ;;
+      systemd/systemd)
+        postinstall=-zconf-postinstall-systemd
+      ;;
+      romkatv/terminfo)
+        postinstall=-zconf-postinstall-terminfo
+      ;;
       *)
         postinstall=
       ;;
@@ -38,23 +53,17 @@ else
   tmux_cmd+=' && print -r -- "$EPOCHREALTIME" >"${ZCONF_PACKAGE_DIR}"/stamp'
   case $#channel-$channel[1] in
     2-command) command=$channel[2];;
-    1-stable|1-testing)
+    1-stable|1-testing|1-dev)
       case $1 in
-        tmux)                       command=$tmux_cmd;;
-        terminfo)                   url=https://github.com/romkatv/terminfo/archive/v1.4.0.tar.gz;;
-        *)                          url=https://github.com/zsh4humans/$1/archive/zconf-$channel[1].tar.gz;;
-      esac
-    ;;
-    1-dev)
-      case $1 in
-        fzf)                          url=https://github.com/junegunn/$1/archive/master.tar.gz;;
-        powerlevel10k)                url=https://github.com/romkatv/$1/archive/master.tar.gz;;
-        systemd)                      url=https://github.com/systemd/$1/archive/master.tar.gz;;
-        zsh-completions)              url=https://github.com/zsh-users/$1/archive/master.tar.gz;;
-        zsh-autosuggestions)          url=https://github.com/zsh-users/$1/archive/master.tar.gz;;
-        zsh-syntax-highlighting)      url=https://github.com/zsh-users/$1/archive/master.tar.gz;;
-        zsh-history-substring-search) url=https://github.com/zsh-users/$1/archive/master.tar.gz;;
-        terminfo)                     url=https://github.com/romkatv/terminfo/archive/v1.3.0.tar.gz;;
+        fzf)                          url=https://github.com/junegunn/fzf/archive/master.tar.gz;;
+        fzf-tab)                      url=https://github.com/Aloxaf/fzf-tab/archive/master.tar.gz;;
+        powerlevel10k)                url=https://github.com/romkatv/powerlevel10k/archive/master.tar.gz;;
+        systemd)                      url=https://github.com/systemd/systemd/archive/main.tar.gz;;
+        zsh-completions)              url=https://github.com/zsh-users/zsh-completions/archive/master.tar.gz;;
+        zsh-autosuggestions)          url=https://github.com/zsh-users/zsh-autosuggestions/archive/master.tar.gz;;
+        zsh-syntax-highlighting)      url=https://github.com/zsh-users/zsh-syntax-highlighting/archive/master.tar.gz;;
+        zsh-history-substring-search) url=https://github.com/zsh-users/zsh-history-substring-search/archive/master.tar.gz;;
+        terminfo)                     url=https://github.com/romkatv/terminfo/archive/v1.4.0.tar.gz;;
         tmux)                         command=$tmux_cmd;;
         *)
           print -Pru2 -- "%F{3}zconf%f: %F{1}internal error%f: unknown package: ${1//\%/%%}"

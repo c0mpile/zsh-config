@@ -14,10 +14,6 @@ local uname_sm
 local -i installed
 
 case $uname_sm in
-  'Darwin arm64')
-    local v=0.25.1
-    local url=https://github.com/zsh4humans/fzf/releases/download/$v/fzf-$v-darwin_arm8.tar.gz
-  ;;
   'Linux i686')
     local v=0.22.0
     local url=https://github.com/junegunn/fzf-bin/releases/download/$v/fzf-$v-linux_386.tgz
