@@ -308,12 +308,14 @@ case "${0-}" in
   */*) script_dir="$PWD/${0%/*}";;
   *) [ -f "./zconf.zsh" ] && [ -f "./install" ] && script_dir="$PWD";;
 esac
+script_dir="${script_dir%/.}"
+script_dir="${script_dir%/}"
 
 if [ -n "$script_dir" ] && [ -f "$script_dir/zconf.zsh" ] && [ -f "$script_dir/.zshenv" ] && [ -f "$script_dir/.zshrc$zshrc_suffix" ]; then
   'command' 'cp' '-f' '--' "$script_dir/zconf.zsh" "$zconf"
   'command' 'cp' '-f' '--' "$script_dir/.zshenv" "$zshenv"
   'command' 'cp' '-f' '--' "$script_dir/.zshrc$zshrc_suffix" "$zshrc"
-  export ZCONF_BOOTSTRAP_COMMAND="'command' 'cp' '-rf' '--' '${script_dir}' '\$ZCONF_PACKAGE_DIR'"
+  export ZCONF_BOOTSTRAP_COMMAND="command cp -rf -- '${script_dir}/.' \"\$ZCONF_PACKAGE_DIR\" && command rm -rf -- \"\$ZCONF_PACKAGE_DIR/.git\""
 else
   >&2 printf '\033[33mzconf\033[0m: fetching \033[4mzconf.zsh\033[0m from \033[1mgithub.com/c0mpile/zsh-config\033[0m\n'
   if ! err="$($fetch "$zconf" '--' "$url"/zconf.zsh 2>&1)"; then
