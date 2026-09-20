@@ -1,5 +1,5 @@
 if '[' '-z' "${ZSH_VERSION-}" ']' || ! 'eval' '[[ "$ZSH_VERSION" == (5.<8->*|<6->.*) ]]'; then
-  '.' "$ZCONF"/zsh4humans/sc/exec-zsh-i || 'return'
+  '.' "$ZCONF"/zconf/sc/exec-zsh-i || 'return'
 fi
 
 if [[ -x /proc/self/exe ]]; then
@@ -24,7 +24,7 @@ fi
 if ! { zmodload -s zsh/terminfo zsh/zselect && [[ -n $^fpath/compinit(#qN) ]] ||
        [[ $ZSH_PATCHLEVEL == zsh-5.8-0-g77d203f && $_zconf_exe == */bin/zsh &&
           -e ${_zconf_exe:h:h}/share/zsh/5.8/scripts/relocate ]] }; then
-  builtin source $ZCONF/zsh4humans/sc/exec-zsh-i || return
+  builtin source $ZCONF/zconf/sc/exec-zsh-i || return
 fi
 
 if [[ ! -o interactive ]]; then
@@ -42,7 +42,7 @@ zmodload -F zsh/files b:{zf_mkdir,zf_mv,zf_rm,zf_rmdir,zf_ln}    || return
 zmodload -F zsh/stat b:zstat                                     || return
 
 () {
-  if [[ $1 != $ZCONF/zsh4humans/main.zsh ]]; then
+  if [[ $1 != $ZCONF/zconf/main.zsh ]]; then
     print -Pru2 -- "%F{3}zconf%f: confusing %Umain.zsh%u location: %F{1}${1//\%/%%}%f"
     return 1
   fi
@@ -78,7 +78,7 @@ function -zconf-init-homebrew() {
 
 if [[ $OSTYPE == darwin* ]]; then
   if [[ ! -e $ZCONF/cache/init-darwin-paths ]] || ! source $ZCONF/cache/init-darwin-paths; then
-    autoload -Uz $ZCONF/zsh4humans/fn/-zconf-gen-init-darwin-paths
+    autoload -Uz $ZCONF/zconf/fn/-zconf-gen-init-darwin-paths
     -zconf-gen-init-darwin-paths && source $ZCONF/cache/init-darwin-paths
   fi
   [[ -z $HOMEBREW_PREFIX ]] && -zconf-init-homebrew {/opt/homebrew,/usr/local}/bin/brew(N)
@@ -92,9 +92,9 @@ fpath=(
   /opt/homebrew/share/zsh/site-functions(-/N)
   /usr{/local,}/share/zsh/{site-functions,vendor-completions}(-/N)
   $fpath
-  $ZCONF/zsh4humans/fn)
+  $ZCONF/zconf/fn)
 
-autoload -Uz -- $ZCONF/zsh4humans/fn/(|-|_)zconf[^.]#(:t) || return
+autoload -Uz -- $ZCONF/zconf/fn/(|-|_)zconf[^.]#(:t) || return
 functions -Ms _zconf_err
 
 () {
@@ -340,7 +340,7 @@ function -zconf-cmd-init() {
               local exec=exec
             fi
             SHELL=$_zconf_exe _ZCONF_LINES=$LINES _ZCONF_COLUMNS=$COLUMNS \
-              builtin $exec - $tmux -u -S $sock -f $ZCONF/zsh4humans/.tmux.conf -- \
+              builtin $exec - $tmux -u -S $sock -f $ZCONF/zconf/.tmux.conf -- \
               "${cmds[@]}" new >/dev/null || return
             [[ -z $exec ]] || return
             builtin cd /
@@ -406,7 +406,7 @@ function -zconf-cmd-init() {
       -zconf-direnv-init 0 || return '_zconf_err()'
     fi
 
-    local rc_zwcs=($ZDOTDIR/{.zshenv,.zprofile,.zshrc,.zlogin,.zlogout}.zwc(N))
+    local rc_zwcs=(~/.zshenv.zwc(N) $ZDOTDIR/{.zshenv,.zprofile,.zshrc,.zlogin,.zlogout}.zwc(N))
     if (( $#rc_zwcs )); then
       -zconf-check-rc-zwcs $rc_zwcs || return '_zconf_err()'
     fi
@@ -459,7 +459,7 @@ function -zconf-cmd-install() {
   return 1
 }
 
-# Main zsh4humans function. Type `zconf help` for usage.
+# Main zconf function. Type `zconf help` for usage.
 function zconf() {
   if (( ${+functions[-zconf-cmd-${1-}]} )); then
     -zconf-cmd-"$1" "${@:2}"

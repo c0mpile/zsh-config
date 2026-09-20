@@ -1,10 +1,10 @@
-# Documentation: https://github.com/c0mpile/zsh-config/blob/v5/README.md.
+# Documentation: https://github.com/c0mpile/zsh-config/blob/main/README.md.
 #
 # Do not modify this file unless you know exactly what you are doing.
 # It is strongly recommended to keep all shell customization and configuration
-# (including exported environment variables such as PATH) in ~/.zshrc or in
-# files sourced from ~/.zshrc. If you are certain that you must export some
-# environment variables in ~/.zshenv, do it where indicated by comments below.
+# (including exported environment variables such as PATH) in
+# ~/.config/zsh/.zshrc or in files sourced from it. If you are certain that you must
+# export some environment variables in ~/.zshenv, do it where indicated by comments below.
 
 if [ -n "${ZSH_VERSION-}" ]; then
   # If you are certain that you must export some environment variables
@@ -14,15 +14,16 @@ if [ -n "${ZSH_VERSION-}" ]; then
   #
   # Do not change anything else in this file.
 
-  : ${ZDOTDIR:=~}
+  : "${ZDOTDIR:=${XDG_CONFIG_HOME:-$HOME/.config}/zsh}"
+  export ZDOTDIR
   setopt no_global_rcs
   [[ -o no_interactive && -z "${ZCONF_BOOTSTRAPPING-}" ]] && return
   setopt no_rcs
   unset ZCONF_BOOTSTRAPPING
 fi
 
-ZCONF_URL="https://raw.githubusercontent.com/c0mpile/zsh-config/v5"
-: "${ZCONF:=${XDG_CACHE_HOME:-$HOME/.cache}/zsh4humans/v5}"
+ZCONF_URL="https://raw.githubusercontent.com/c0mpile/zsh-config/main"
+: "${ZCONF:=${XDG_CACHE_HOME:-$HOME/.cache}/zsh}"
 
 umask o-w
 

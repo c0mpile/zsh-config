@@ -7,7 +7,7 @@ eval "$_zconf_opt"
 local min_version=${ZCONF_SSH%%:*}
 
 local got_version
-got_version=${$(<$ZCONF/zsh4humans/version)%$'\r'} &&
+got_version=${$(<$ZCONF/zconf/version)%$'\r'} &&
   [[ $got_version == <-> ]]                      &&
   (( got_version >= min_version ))               &&
   return

@@ -52,9 +52,9 @@ Run this command in bash, zsh, or sh:
 
 ```shell
 if command -v curl >/dev/null 2>&1; then
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/c0mpile/zsh-config/v5/install)"
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/c0mpile/zsh-config/main/install)"
 else
-  sh -c "$(wget -O- https://raw.githubusercontent.com/c0mpile/zsh-config/v5/install)"
+  sh -c "$(wget -O- https://raw.githubusercontent.com/c0mpile/zsh-config/main/install)"
 fi
 ```
 
@@ -80,14 +80,14 @@ changes to the file system. Once you exit Zsh, the image is deleted.
   ```zsh
   docker run -e TERM -e COLORTERM -e LC_ALL=C.UTF-8 -w /root -it --detach-keys="ctrl-^,ctrl-@" --rm alpine sh -uec '
     apk add zsh curl tmux
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/c0mpile/zsh-config/v5/install)"'
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/c0mpile/zsh-config/main/install)"'
   ```
 - **Ubuntu**: install additional software with `apt install <package>`:
   ```zsh
   docker run -e TERM -e COLORTERM -w /root -it --detach-keys="ctrl-^,ctrl-@" --rm ubuntu sh -uec '
     apt-get update
     apt-get install -y zsh curl tmux
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/c0mpile/zsh-config/v5/install)"'
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/c0mpile/zsh-config/main/install)"'
   ```
 
 ## Caveats
@@ -166,17 +166,17 @@ When you connect to a remote host over SSH, your local Zsh for Humans environmen
 over to it. The first login to a remote host may take some time. After that it's as fast as normal
 `ssh`.
 
-Search for "ssh" in your `~/.zshrc` for information on how to enable and configure SSH
+Search for "ssh" in your `~/.config/zsh/.zshrc` for information on how to enable and configure SSH
 teleportation.
 
 ## Customization
 
-You can (and should) edit `~/.zshrc` to customize your shell. It's a very good idea to read through
+You can (and should) edit `~/.config/zsh/.zshrc` to customize your shell. It's a very good idea to read through
 the whole file to see which customization options are in there and to flip some of them to your
 liking.
 
 When adding your customizations, put them next to the existing lines that do similar things. The
-default `~/.zshrc` contains the following types of customizations that should serve as examples:
+default `~/.config/zsh/.zshrc` contains the following types of customizations that should serve as examples:
 
 - Export environment variables.
 - Extend `PATH`.
@@ -194,9 +194,9 @@ default `~/.zshrc` contains the following types of customizations that should se
 
 Prompt in Zsh for Humans is provided by [Powerlevel10k](https://github.com/romkatv/powerlevel10k).
 Run `p10k configure` to access its interactive configuration wizard. Further customization can be
-done by editing `~/.p10k*.zsh` files. There can be more than one configuration file to account for
-terminals with limited capabilities. Most users will ever only see `~/.p10k.zsh`. When in doubt,
-consult `$POWERLEVEL9K_CONFIG_FILE`. This parameter is set by Zsh for Humans and it always points
+done by editing `~/.config/zsh/.p10k*.zsh` files. There can be more than one configuration file to account for
+terminals with limited capabilities. Most users will ever only see `~/.config/zsh/.p10k.zsh`. When in doubt,
+consult `$POWERLEVEL9K_CONFIG_FILE`. This parameter is set by zconf and it always points
 to the Powerlevel10k config file currently in use.
 
 See [Powerlevel10k](https://github.com/romkatv/powerlevel10k) homepage for more information.
@@ -238,29 +238,30 @@ everywhere.
 
 ### Additional Zsh startup files
 
-When you start Zsh, it automatically sources `~/.zshenv` and `~/.zshrc`. The former bootstraps Zsh
-for Humans, the latter is your personal config. It is strongly recommended to keep all shell
-customization and configuration (including exported environment variables such as `PATH`) in
-`~/.zshrc` or in files sourced from `~/.zshrc`. If you are certain that you must export some
-environment variables in `~/.zshenv`, do it where indicated by comments.
+When you start Zsh, it automatically sources `~/.zshenv`, which sets `ZDOTDIR=~/.config/zsh`, and
+then `$ZDOTDIR/.zshrc` (`~/.config/zsh/.zshrc`). The former bootstraps zconf, the latter is your
+personal config. It is strongly recommended to keep all shell customization and configuration
+(including exported environment variables such as `PATH`) in `~/.config/zsh/.zshrc` or in files sourced
+from it. If you are certain that you must export some environment variables in `~/.zshenv`, do it where
+indicated by comments.
 
 Zsh supports several additional startup files with complex rules governing when each file is
-sourced. The additional startup files are `~/.zprofile`, `~/.zlogin` and `~/.zlogout`. **Do not
-create these files** unless you are absolutely certain you need them.
+sourced. The additional startup files are `.zprofile`, `.zlogin` and `.zlogout` (located in `~/.config/zsh/`).
+**Do not create these files** unless you are absolutely certain you need them.
 
 ## Updating
 
-Run `zconf update` to update Zsh for Humans. There is no update mechanism for `~/.zshrc` itself.
+Run `zconf update` to update zconf. There is no update mechanism for `~/.config/zsh/.zshrc` itself.
 
 ## Uninstalling
 
-1. Delete or replace `~/.zshenv` and `~/.zshrc`. If you had these files prior to the installation of
-   Zsh for Humans and have replied in the affirmative when asked by the installer whether you want
+1. Delete or replace `~/.zshenv` and `~/.config/zsh/.zshrc`. If you had these files prior to the installation of
+   zconf and have replied in the affirmative when asked by the installer whether you want
    them backed up, you can find them in `~/zsh-backup`.
 2. Restart your terminal. **Restarting zsh is not enough.**
-3. Delete Zsh for Humans cache:
+3. Delete zconf cache:
    ```zsh
-   rm -rf -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh4humans/v5"
+   rm -rf -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
    ```
 
 ## Advanced configuration tips

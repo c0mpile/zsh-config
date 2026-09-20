@@ -274,7 +274,7 @@ And here's prompt:
 typeset -g POWERLEVEL9K_CONTEXT_TEMPLATE=%n@${${${ZCONF_SSH##*:}//\%/%%}:-%m}
 ```
 
-The latter should go in `~/.p10k.zsh`. You might already have some `CONTEXT`
+The latter should go in `~/.config/zsh/.p10k.zsh`. You might already have some `CONTEXT`
 templates in there. Customize them as needed.
 
 ### SSH config
@@ -332,7 +332,7 @@ wiped. It also allows you to share command history between hosts. The mechanism
 is very flexible but not easy to configure. Here's something to get you started.
 
 ```zsh
-# This function is invoked by zsh4humans on every ssh command after
+# This function is invoked by zconf on every ssh command after
 # the instructions from ssh-related zstyles have been applied. It allows
 # us to configure ssh teleportation in ways that cannot be done with
 # zstyles.
@@ -452,7 +452,7 @@ Usually this shouldn't be necessary because SSH teleportation automatically
 updates Zsh for Humans on the remote host if your local rc files require a newer
 version than what's available there. When a new feature is added to Zsh for
 Humans (a function, an alias, a zstyle, etc.), [version](
-  https://github.com/c0mpile/zsh-config/blob/v5/version) gets bumped. When
+  https://github.com/c0mpile/zsh-config/blob/main/version) gets bumped. When
 teleporting, the version number of the local Zsh for Humans installation is sent
 over to the remote (it's the first part of `$ZCONF_SSH`) and the remote is updated
 if its version is lower. This ensures that your rc files are compatible with
@@ -600,8 +600,8 @@ It's highly recommended to [store your dotfiles in a git repository](
 files:
 
 - `~/.zshenv`
-- `~/.zshrc`
-- `~/.p10k*.zsh` (there can be more than one).
+- `~/.config/zsh/.zshrc`
+- `~/.config/zsh/.p10k*.zsh` (there can be more than one).
 
 You don't need to run Zsh for Humans installer on a new machine. Simply
 copy/restore these files and Zsh for Humans will bootstrap itself. If you don't
@@ -669,12 +669,10 @@ what you like. As an option, here's what the author of Zsh for Humans uses.
 > etc. If I hit <kbd>Ctrl+P</kbd> another time, it activates dotfiles-private.
 > Another <kbd>Ctrl+P</kbd> gets me to normal state.
 
-### Alternative `ZDOTDIR`
+### `ZDOTDIR`
 
-By default zsh startup files are stored in the home directory. If you want to
-store them in `~/.config/zsh` instead, use [this script](
-  https://gist.github.com/romkatv/ecce772ce46b36262dc2e702ea15df9f) to migrate.
-Note that `~/.zshenv` will still exist. Without it zsh won't know where to look
+By default, zconf stores zsh startup files in `~/.config/zsh` (`${XDG_CONFIG_HOME:-$HOME/.config}/zsh`).
+Note that `~/.zshenv` remains in your home directory so that zsh knows where to look
 for startup files.
 
 ## Privileged shell

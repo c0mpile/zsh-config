@@ -189,8 +189,8 @@ Change the structure of `$ZCONF` to this:
 ```text
 .
 ├── bin
-├── romkatv
-│   └── zsh4humans
+├── c0mpile
+│   └── zconf
 │       ├── fn
 │       │   ├── -zconf-clone
 │       │   └── zconf-help
@@ -204,14 +204,14 @@ Change the structure of `$ZCONF` to this:
 `zconf.zsh` is in fact a pure POSIX sh script. It looks like this:
 
 ```sh
-if [ -e "$ZCONF"/zsh4humans/main.zsh ]; then
-  . "$ZCONF"/zsh4humans/main.zsh
+if [ -e "$ZCONF"/zconf/main.zsh ]; then
+  . "$ZCONF"/zconf/main.zsh
   return
 fi
 
 # git clone, curl or wget c0mpile/zsh-config
 
-. "$ZCONF"/zsh4humans/main.zsh
+. "$ZCONF"/zconf/main.zsh
 ```
 
 `c0mpile/zsh-config` shouldn't be hard-coded but derived from `$ZCONF_URL`.
@@ -436,7 +436,7 @@ code on top. Guard the new code with `ZLE_EXPERIMENTAL_SAVE_RESTORE_CURSOR`.
 Create a patch from this commit and store it in `zsh-bin`. Modify `build` to apply the patch.
 Set patchlevel to the commit hash from `zle-experimental-save-restore-cursor`.
 
-Add `ZLE_EXPERIMENTAL_SAVE_RESTORE_CURSOR=1` to zsh4humans.
+Add `ZLE_EXPERIMENTAL_SAVE_RESTORE_CURSOR=1` to zconf.
 
 ---
 
@@ -985,7 +985,7 @@ List `~/.tmux.conf` in `~/.zshrc` among the files to send over ssh.
 
 ---
 
-Make it possible for users to tell which commit their zsh4humans is synced to.
+Make it possible for users to tell which commit their zconf is synced to.
 
 ---
 

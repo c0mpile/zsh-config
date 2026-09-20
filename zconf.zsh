@@ -138,9 +138,9 @@ if '[' '-n' "${ZSH_VERSION-}" ']'; then
 fi
 
 if '[' '-n' "${ZCONF-}" ']' &&
-   '[' "${ZCONF_URL-}" '=' 'https://raw.githubusercontent.com/c0mpile/zsh-config/v5' ']' &&
-   '[' '-z' "${ZCONF##/*}" '-a' '-r' "$ZCONF"/zsh4humans/main.zsh ']'; then
-  if '.' "$ZCONF"/zsh4humans/main.zsh; then
+   '[' "${ZCONF_URL-}" '=' 'https://raw.githubusercontent.com/c0mpile/zsh-config/main' ']' &&
+   '[' '-z' "${ZCONF##/*}" '-a' '-r' "$ZCONF"/zconf/main.zsh ']'; then
+  if '.' "$ZCONF"/zconf/main.zsh; then
     'setopt' 'aliases'
     'return'
   fi
@@ -161,7 +161,7 @@ if '[' '-n' "${_zconf_bootstrap-}" ']'; then
         >&2 'printf' 'It must be set in \033[4;33m"$ZDOTDIR"\033[0;4m/.zshenv\033[0m:\n'
       fi
       >&2 'printf' '\n'
-      >&2 'printf' '  \033[32m:\033[0m \033[33m"${ZCONF:=${XDG_CACHE_HOME:-$HOME/.cache}/zsh4humans/v5}"\033[0m\n'
+      >&2 'printf' '  \033[32m:\033[0m \033[33m"${ZCONF:=${XDG_CACHE_HOME:-$HOME/.cache}/zsh}"\033[0m\n'
       >&2 'printf' '\n'
       >&2 'printf' 'Note: The leading colon (\033[32m:\033[0m) is necessary.\n'
       'exit' '1'
@@ -176,7 +176,7 @@ if '[' '-n' "${_zconf_bootstrap-}" ']'; then
         >&2 'printf' 'It comes from \033[4;33m"$ZDOTDIR"\033[0;4m/.zshenv\033[0m. Correct value example:\n'
       fi
       >&2 'printf' '\n'
-      >&2 'printf' '  \033[32m:\033[0m \033[33m"${ZCONF:=${XDG_CACHE_HOME:-$HOME/.cache}/zsh4humans/v5}"\033[0m\n'
+      >&2 'printf' '  \033[32m:\033[0m \033[33m"${ZCONF:=${XDG_CACHE_HOME:-$HOME/.cache}/zsh}"\033[0m\n'
       >&2 'printf' '\n'
       >&2 'printf' 'Note: The leading colon (\033[32m:\033[0m) is necessary.\n'
       'exit' '1'
@@ -191,7 +191,7 @@ if '[' '-n' "${_zconf_bootstrap-}" ']'; then
         >&2 'printf' 'Please fix \033[4;33m"$ZDOTDIR"\033[0;4m/.zshenv\033[0m. Correct initialization example:\n'
       fi
       >&2 'printf' '\n'
-      >&2 'printf' '  \033[32m:\033[0m \033[33m"${ZCONF:=${XDG_CACHE_HOME:-$HOME/.cache}/zsh4humans/v5}"\033[0m\n'
+      >&2 'printf' '  \033[32m:\033[0m \033[33m"${ZCONF:=${XDG_CACHE_HOME:-$HOME/.cache}/zsh}"\033[0m\n'
       >&2 'printf' '  \033[32m.\033[0m \033[4;33m"$ZCONF"\033[0;4m/zconf.zsh\033[0m || \033[32mreturn\033[0m\n'
       >&2 'printf' '\n'
       >&2 'printf' 'Note: The leading colon (\033[32m:\033[0m) and dot (\033[32m.\033[0m) are necessary.\n'
@@ -207,13 +207,11 @@ if '[' '-n' "${_zconf_bootstrap-}" ']'; then
         >&2 'printf' 'It must be set at the top of \033[4;33m"$ZDOTDIR"\033[0;4m/.zshenv\033[0m:\n'
       fi
       >&2 'printf' '\n'
-      >&2 'printf' '  ZCONF_URL=\033[33m"https://raw.githubusercontent.com/c0mpile/zsh-config/v5"\033[0m\n'
+      >&2 'printf' '  ZCONF_URL=\033[33m"https://raw.githubusercontent.com/c0mpile/zsh-config/main"\033[0m\n'
       'exit' '1'
     fi
 
-    v="${ZCONF_URL#https://raw.githubusercontent.com/c0mpile/zsh-config/v}"
-
-    if '[' '-z' "$v" ']' || '[' "$v" '=' "$ZCONF_URL" ']'; then
+    if '[' "${ZCONF_URL-}" '!=' 'https://raw.githubusercontent.com/c0mpile/zsh-config/main' ']'; then
       >&2 'printf' '\033[33mzconf\033[0m: invalid \033[1mZCONF_URL\033[0m: \033[31m%s\033[0m\n' "$ZCONF_URL"
       >&2 'printf' '\n'
       if '[' "${ZDOTDIR:-$HOME}" '=' "$HOME" ']'; then
@@ -222,33 +220,18 @@ if '[' '-n' "${_zconf_bootstrap-}" ']'; then
         >&2 'printf' 'It comes from \033[4;33m"$ZDOTDIR"\033[0;4m/.zshenv\033[0m. Correct value example:\n'
       fi
       >&2 'printf' '\n'
-      >&2 'printf' '  ZCONF_URL=\033[33m"https://raw.githubusercontent.com/c0mpile/zsh-config/v5"\033[0m\n'
-      'exit' '1'
-    fi
-
-    if '[' "v$v" '!=' 'v5' ']'; then
-      >&2 'printf' '\033[33mzconf\033[0m: unexpected major version in \033[1mZCONF_URL\033[0m\n'
-      >&2 'printf' '\n'
-      >&2 'printf' 'Expected:\n'
-      >&2 'printf' '\n'
-      >&2 'printf' '  ZCONF_URL=\033[33m"%s"\033[0m\n' "https://raw.githubusercontent.com/c0mpile/zsh-config/v5"
-      >&2 'printf' '\n'
-      >&2 'printf' 'Found:\n'
-      >&2 'printf' '\n'
-      >&2 'printf' '  ZCONF_URL=\033[33m"%s"\033[0m\n' "$ZCONF_URL"
-      >&2 'printf' '\n'
-      >&2 'printf' 'Delete \033[4m%s\033[0m to switch to \033[1mv%s\033[0m.\n' "$ZCONF" "$v"
+      >&2 'printf' '  ZCONF_URL=\033[33m"https://raw.githubusercontent.com/c0mpile/zsh-config/main"\033[0m\n'
       'exit' '1'
     fi
 
     if '[' '-e' "$ZCONF"/.updating ']'; then
-      >&2 'printf' '\033[33mzconf\033[0m: updating \033[1m%s\033[0m\n' "zsh4humans"
+      >&2 'printf' '\033[33mzconf\033[0m: updating \033[1m%s\033[0m\n' "zconf"
     else
-      >&2 'printf' '\033[33mzconf\033[0m: installing \033[1m%s\033[0m\n' "zsh4humans"
+      >&2 'printf' '\033[33mzconf\033[0m: installing \033[1m%s\033[0m\n' "zconf"
     fi
 
-    if '[' '-n' "${HOME-}" ']'                       &&
-       '[' "$ZCONF" = "$HOME"/.cache/zsh4humans/v5 ']' &&
+    if '[' '-n' "${HOME-}" ']'                    &&
+       '[' "$ZCONF" = "$HOME"/.cache/zsh ']' &&
        command -v 'id' >'/dev/null' 2>&1; then
       euid="$('command' 'id' '-u')" || 'exit'
       if '[' "$euid" '=' '0' ']'; then
@@ -256,14 +239,14 @@ if '[' '-n' "${_zconf_bootstrap-}" ']'; then
         home_owner="$('printf' '%s\n' "$home_ls" | 'command' 'awk' 'NR==1 {print $3}')" || 'exit'
         if '[' "$home_owner" '!=' 'root' ']'; then
           >&2 'printf' '\033[33mzconf\033[0m: refusing to \033[1minstall\033[0m as \033[31mroot\033[0m\n'
-          'command' 'rm' '-rf' '--' "$HOME"/.cache/zsh4humans/v5 2>'/dev/null' &&
-            'command' 'rmdir' '--' "$HOME"/.cache/zsh4humans "$HOME"/.cache 2>'/dev/null'
+          'command' 'rm' '-rf' '--' "$HOME"/.cache/zsh 2>'/dev/null' &&
+            'command' 'rmdir' '--' "$HOME"/.cache 2>'/dev/null'
           'exit' '1'
         fi
       fi
     fi
 
-    dir="$ZCONF"/zsh4humans
+    dir="$ZCONF"/zconf
 
     if command -v 'mktemp' >'/dev/null' 2>&1; then
       tmpdir="$('command' 'mktemp' '-d' "$dir".XXXXXXXXXX)"
@@ -275,13 +258,13 @@ if '[' '-n' "${_zconf_bootstrap-}" ']'; then
 
     (
       if '[' '-n' "${ZCONF_BOOTSTRAP_COMMAND-}" ']'; then
-        ZCONF_PACKAGE_NAME='zsh4humans'
-        ZCONF_PACKAGE_DIR="$tmpdir"/zsh4humans-"$v"
+        ZCONF_PACKAGE_NAME='zconf'
+        ZCONF_PACKAGE_DIR="$tmpdir"/zconf-main
         'eval' "$ZCONF_BOOTSTRAP_COMMAND" || 'exit'
       fi
 
       if '[' '-z' "${ZCONF_BOOTSTRAP_COMMAND-}" ']'; then
-        url="https://github.com/c0mpile/zsh-config/archive/v$v.tar.gz"
+        url="https://github.com/c0mpile/zsh-config/archive/refs/heads/main.tar.gz"
 
         if command -v 'curl' >'/dev/null' 2>&1; then
           err="$('command' 'curl' '-fsSL' '--' "$url" 2>&1 >"$tmpdir"/snapshot.tar.gz)"
@@ -301,6 +284,18 @@ if '[' '-n' "${_zconf_bootstrap-}" ']'; then
         'command' 'tar' '-C' "$tmpdir" '-xzf' "$tmpdir"/snapshot.tar.gz || 'exit'
       fi
 
+      pkg_dir=''
+      for d in "$tmpdir"/*; do
+        if [ -d "$d" ]; then
+          pkg_dir="$d"
+          break
+        fi
+      done
+      if [ -z "$pkg_dir" ]; then
+        >&2 'printf' '\033[33mzconf\033[0m: extracted archive is empty\n'
+        'exit' '1'
+      fi
+
       if '[' '-e' "$ZCONF"/.updating ']'; then
         if '[' '-z' "${ZCONF_UPDATING-}" ']'; then
           >&2 'printf' '\033[33mzconf\033[0m: \033[1mZCONF_UPDATING\033[0m does not propagate through \033[32mzsh\033[0m\n'
@@ -308,18 +303,18 @@ if '[' '-n' "${_zconf_bootstrap-}" ']'; then
           >&2 'printf' 'Change \033[32mzsh\033[0m startup files to keep \033[1mZCONF_UPDATING\033[0m intact.\n'
           'exit' '1'
         fi
-        "sh" "$tmpdir"/zsh4humans-"$v"/sc/setup '-n' "$ZCONF" '-o' "$ZCONF_UPDATING" || 'exit'
+        "sh" "$pkg_dir"/sc/setup '-n' "$ZCONF" '-o' "$ZCONF_UPDATING" || 'exit'
       else
-        "sh" "$tmpdir"/zsh4humans-"$v"/sc/setup '-n' "$ZCONF"                      || 'exit'
+        "sh" "$pkg_dir"/sc/setup '-n' "$ZCONF"                      || 'exit'
       fi
       'command' 'rm' '-rf' '--' "$dir"                          || 'exit'
-      'command' 'mv' '-f' '--' "$tmpdir"/zsh4humans-"$v" "$dir" || 'exit'
+      'command' 'mv' '-f' '--' "$pkg_dir" "$dir" || 'exit'
     )
 
     ret="$?"
     'command' 'rm' '-rf' '--' "$tmpdir" || 'exit'
     'exit' "$ret"
-  ) && '.' "$ZCONF"/zsh4humans/main.zsh && 'setopt' 'aliases' && 'return'
+  ) && '.' "$ZCONF"/zconf/main.zsh && 'setopt' 'aliases' && 'return'
 fi
 
 '[' '-n' "${ZSH_VERSION-}" ']' && 'setopt' 'aliases'
@@ -363,12 +358,12 @@ if command -v 'curl' >'/dev/null' 2>&1; then
   >&2 'printf' '\n'
   >&2 'printf' 'Give up and start over:\n'
   >&2 'printf' '\n'
-  >&2 'printf' '  \033[32msh\033[0m -c \033[33m"\033[0m$(\033[32mcurl\033[0m -fsSL \033[4mhttps://raw.githubusercontent.com/c0mpile/zsh-config/v5/install\033[0m)\033[33m"\033[0m\n'
+  >&2 'printf' '  \033[32msh\033[0m -c \033[33m"\033[0m$(\033[32mcurl\033[0m -fsSL \033[4mhttps://raw.githubusercontent.com/c0mpile/zsh-config/main/install\033[0m)\033[33m"\033[0m\n'
 elif command -v 'wget' >'/dev/null' 2>&1; then
   >&2 'printf' '\n'
   >&2 'printf' 'Give up and start over:\n'
   >&2 'printf' '\n'
-  >&2 'printf' '  \033[32msh\033[0m -c \033[33m"\033[0m$(\033[32mwget\033[0m -O- \033[4mhttps://raw.githubusercontent.com/c0mpile/zsh-config/v5/install\033[0m)\033[33m"\033[0m\n'
+  >&2 'printf' '  \033[32msh\033[0m -c \033[33m"\033[0m$(\033[32mwget\033[0m -O- \033[4mhttps://raw.githubusercontent.com/c0mpile/zsh-config/main/install\033[0m)\033[33m"\033[0m\n'
 fi
 
 >&2 'printf' '\n'

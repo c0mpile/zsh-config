@@ -27,7 +27,7 @@ zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
 if (( !_zconf_dangerous_root )) && zstyle -t ':completion::complete:' use-cache; then
   local cache
   zstyle -s ':completion::complete:' cache-path cache
-  : ${cache:=${ZDOTDIR:-~}/.zcompcache}
+  : ${cache:=$ZCONF/cache/zcompcache}
   if [[ ! -e $cache ]]; then
     zf_mkdir -m 0700 -p -- $cache
   fi

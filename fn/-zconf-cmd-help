@@ -12,7 +12,7 @@ if (( ARGC == 1 )); then
     update)
       print -Pr -- "Usage: %F{2}zconf%f %Bupdate%b"
       print -Pr -- ""
-      print -Pr -- "Update %Bzsh4humans%b and all dependencies (%Bfzf%b, %Bzsh-autosuggestions%b, etc.)."
+      print -Pr -- "Update %Bzconf%b and all dependencies (%Bfzf%b, %Bzsh-autosuggestions%b, etc.)."
     ;;
     init)
       print -Pr -- "Usage: %F{2}zconf%f %Binit%b"

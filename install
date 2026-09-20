@@ -217,15 +217,20 @@ while 'true'; do
   esac
 done
 
+zdotdir="${ZDOTDIR:-${XDG_CONFIG_HOME:-$HOME/.config}/zsh}"
 rcs=''
 
 for f in ~/'.zshenv' ~/'.zshenv.zwc'     \
          ~/'.zprofile' ~/'.zprofile.zwc' \
          ~/'.zshrc' ~/'.zshrc.zwc'       \
          ~/'.zlogin' ~/'.zlogin.zwc'     \
-         ~/'.zlogout' ~/'.zlogout.zwc'; do
+         ~/'.zlogout' ~/'.zlogout.zwc'   \
+         "$zdotdir"/.zprofile "$zdotdir"/.zprofile.zwc \
+         "$zdotdir"/.zshrc "$zdotdir"/.zshrc.zwc       \
+         "$zdotdir"/.zlogin "$zdotdir"/.zlogin.zwc     \
+         "$zdotdir"/.zlogout "$zdotdir"/.zlogout.zwc; do
   if '[' '-e' "$f" ']'; then
-    rcs="$rcs ${f##*/}"
+    rcs="$rcs $f"
   fi
 done
 
@@ -247,7 +252,7 @@ if '[' '-n' "$rcs" ']'; then
   >&2 'printf' 'You have the following Zsh \033[1mstartup files\033[0m:\n'
   >&2 'printf' '\n'
   for f in $rcs; do
-    >&2 'printf' '    \033[4m~/%s\033[0m\n' "$f"
+    >&2 'printf' '    \033[4m%s\033[0m\n' "${f/#$HOME/'~'}"
   done
   >&2 'printf' '\n'
   >&2 'printf' 'What should I do with them?\n'
@@ -291,32 +296,46 @@ else
   zconf="$HOME"/.zconf.tmp."$$"
 fi
 
-url='https://raw.githubusercontent.com/c0mpile/zsh-config/v5'
+url='https://raw.githubusercontent.com/c0mpile/zsh-config/main'
 
 >&2 'printf' '\n'
->&2 'printf' 'Settings up \033[33mZsh For Humans\033[0m...\n'
+>&2 'printf' 'Setting up \033[33mzconf\033[0m...\n'
 >&2 'printf' '\n'
 
->&2 printf '\033[33mzconf\033[0m: fetching \033[4mzconf.zsh\033[0m from \033[1mgithub.com/c0mpile/zsh-config\033[0m\n'
-if ! err="$($fetch "$zconf" '--' "$url"/zconf.zsh 2>&1)"; then
-  >&2 'printf' "%s\n" "$err"
-  >&2 'printf' '\033[33mzconf\033[0m: failed to download \033[31m%s\033[0m\n' "$url"/zconf.zsh
-  'command' 'rm' '-rf' '--' "$zconf" 2>'/dev/null'
-  'exit' '1'
-fi
+script_dir=''
+case "${0-}" in
+  /*) script_dir="${0%/*}";;
+  */*) script_dir="$PWD/${0%/*}";;
+  *) [ -f "./zconf.zsh" ] && [ -f "./install" ] && script_dir="$PWD";;
+esac
 
->&2 'printf' '\033[33mzconf\033[0m: generating \033[4m~/.zshenv\033[0m\n'
-if ! err="$($fetch "$zshenv" '--' "$url"/.zshenv 2>&1)"; then
-  >&2 'printf' "%s\n" "$err"
-  >&2 'printf' '\033[33mzconf\033[0m: failed to download \033[31m%s\033[0m\n' "$url"/.zshenv
-  'exit' '1'
-fi
+if [ -n "$script_dir" ] && [ -f "$script_dir/zconf.zsh" ] && [ -f "$script_dir/.zshenv" ] && [ -f "$script_dir/.zshrc$zshrc_suffix" ]; then
+  'command' 'cp' '-f' '--' "$script_dir/zconf.zsh" "$zconf"
+  'command' 'cp' '-f' '--' "$script_dir/.zshenv" "$zshenv"
+  'command' 'cp' '-f' '--' "$script_dir/.zshrc$zshrc_suffix" "$zshrc"
+  export ZCONF_BOOTSTRAP_COMMAND="'command' 'cp' '-rf' '--' '${script_dir}' '\$ZCONF_PACKAGE_DIR'"
+else
+  >&2 printf '\033[33mzconf\033[0m: fetching \033[4mzconf.zsh\033[0m from \033[1mgithub.com/c0mpile/zsh-config\033[0m\n'
+  if ! err="$($fetch "$zconf" '--' "$url"/zconf.zsh 2>&1)"; then
+    >&2 'printf' "%s\n" "$err"
+    >&2 'printf' '\033[33mzconf\033[0m: failed to download \033[31m%s\033[0m\n' "$url"/zconf.zsh
+    'command' 'rm' '-rf' '--' "$zconf" 2>'/dev/null'
+    'exit' '1'
+  fi
 
->&2 'printf' '\033[33mzconf\033[0m: generating \033[4m~/.zshrc\033[0m\n'
-if ! err="$($fetch "$zshrc" '--' "$url"/.zshrc"$zshrc_suffix" 2>&1)"; then
-  >&2 'printf' "%s\n" "$err"
-  >&2 'printf' '\033[33mzconf\033[0m: failed to download \033[31m%s\033[0m\n' "$url"/.zshrc"$zshrc_suffix"
-  'exit' '1'
+  >&2 'printf' '\033[33mzconf\033[0m: generating \033[4m~/.zshenv\033[0m\n'
+  if ! err="$($fetch "$zshenv" '--' "$url"/.zshenv 2>&1)"; then
+    >&2 'printf' "%s\n" "$err"
+    >&2 'printf' '\033[33mzconf\033[0m: failed to download \033[31m%s\033[0m\n' "$url"/.zshenv
+    'exit' '1'
+  fi
+
+  >&2 'printf' '\033[33mzconf\033[0m: generating \033[4m%s/.zshrc\033[0m\n' "${zdotdir/#$HOME/'~'}"
+  if ! err="$($fetch "$zshrc" '--' "$url"/.zshrc"$zshrc_suffix" 2>&1)"; then
+    >&2 'printf' "%s\n" "$err"
+    >&2 'printf' '\033[33mzconf\033[0m: failed to download \033[31m%s\033[0m\n' "$url"/.zshrc"$zshrc_suffix"
+    'exit' '1'
+  fi
 fi
 
 if '[' "$tmux" '=' '1' ']'; then
@@ -336,24 +355,28 @@ if '[' '-r' '/proc/version' ']' && 'command' 'grep' '-q' '[Mm]icrosoft' '/proc/v
   'command' 'mv' '--' "$zshrc.bak" "$zshrc"
 fi
 
-ZCONF="${XDG_CACHE_HOME:-$HOME/.cache}/zsh4humans/v5"
+ZCONF="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 
 'umask' 'o-w'
 
 'command' 'rm' '-rf' '--' "$ZCONF"
-'command' 'mkdir' '-p' -- "$ZCONF"
+'command' 'mkdir' '-p' -- "$ZCONF" "$zdotdir"
 
 if '[' '-n' "$backup_dir" ']'; then
   'command' 'mkdir' '-p' '--' "$backup_dir"
-  ('cd' && 'command' 'cp' '-p' '--' $rcs "$backup_dir"/) || 'exit'
+  for f in $rcs; do
+    'command' 'cp' '-p' '--' "$f" "$backup_dir"/ || 'exit'
+  done
 fi
 
 if '[' '-n' "$rcs" ']'; then
-  ('cd' && 'command' 'rm' '-f' '--' $rcs ) || 'exit'
+  for f in $rcs; do
+    'command' 'rm' '-f' '--' "$f" || 'exit'
+  done
 fi
 
 'command' 'mv' '--' "$zshenv" ~/'.zshenv'
-'command' 'mv' '--' "$zshrc" ~/'.zshrc'
+'command' 'mv' '--' "$zshrc" "$zdotdir"/.zshrc
 'command' 'mv' '--' "$zconf" "$ZCONF"/zconf.zsh
 
 'printf' '%s\n' "$backup_dir" >"$ZCONF"/welcome
@@ -362,7 +385,7 @@ fi
 
 >&2 'printf' '\033[33mzconf\033[0m: bootstrapping \033[32mzsh\033[0m environment\n'
 
-'export' ZDOTDIR="$HOME"
+'export' ZDOTDIR="$zdotdir"
 ZCONF_BOOTSTRAPPING='1'
 'set' '+ue'
 'set' '--'

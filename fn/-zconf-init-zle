@@ -1051,7 +1051,7 @@ function -zconf-post-init() {
 
   if [[ -v functions[bracketed-paste-magic] ]]; then
     builtin unfunction bracketed-paste-magic
-    builtin autoload -Uz -- $ZCONF/zsh4humans/fn/bracketed-paste-magic
+    builtin autoload -Uz -- $ZCONF/zconf/fn/bracketed-paste-magic
   fi
 
   if (( ! $+_zconf_iterm_cmd )) && [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then

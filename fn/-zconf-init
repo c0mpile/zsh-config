@@ -4,7 +4,7 @@ autoload -Uz add-zsh-hook || return
 
 if [[ $commands[zsh] != $_zconf_exe ]]; then
   export _ZCONF_EXE=$_zconf_exe
-  path=($ZCONF/zsh4humans/zb $path)
+  path=($ZCONF/zconf/zb $path)
 fi
 
 # Use lesspipe if available. It allows you to use less on binary files (*.tar.gz, *.jpg, etc.).
@@ -110,7 +110,7 @@ function -zconf-wrap-commands() {
 
 -zconf-wrap-commands
 
-if [[ ! -e $ZCONF/zsh4humans/fn/-zconf-compinit-impl ]]; then
+if [[ ! -e $ZCONF/zconf/fn/-zconf-compinit-impl ]]; then
   -zconf-postinstall-self || return
 fi
 

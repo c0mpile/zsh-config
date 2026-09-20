@@ -37,7 +37,7 @@ local new=$ZCONF.new.$$
     print -Pru2 -- ''
     print -Pru2 -- 'For example:'
     print -Pru2 -- ''
-    print -Pru2 -- '  %F{2}:%f %F{3}"${ZCONF:=${XDG_CACHE_HOME:-$HOME/.cache}/zsh4humans}"%f'
+    print -Pru2 -- '  %F{2}:%f %F{3}"${ZCONF:=${XDG_CACHE_HOME:-$HOME/.cache}/zsh}"%f'
     print -Pru2 -- ''
     print -Pru2 -- 'Note: The leading colon (%F{2}:%f) is necessary.'
     return 1

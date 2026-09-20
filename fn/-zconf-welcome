@@ -11,12 +11,12 @@ backup_dir=$(<$ZCONF/welcome) || return
 zf_rm -f -- $ZCONF/welcome
 
 () {
-  [[ $POWERLEVEL9K_CONFIG_FILE != ~/.p10k.zsh ]] && return
+  [[ $POWERLEVEL9K_CONFIG_FILE != $ZDOTDIR/.p10k.zsh ]] && return
   [[ $POWERLEVEL9K_ICON_PADDING == none ]] || return
   [[ $POWERLEVEL9K_MODE == nerdfont-complete ]] && return
   [[ $POWERLEVEL9K_MODE == ascii ]] || return
   local cfg
-  cfg=$(<~/.p10k.zsh) || return
+  cfg=$(<$POWERLEVEL9K_CONFIG_FILE) || return
   [[ $cfg == *'nerdfont-complete + powerline'* ]] || return
 }
 local -i suggest_font=$?
@@ -28,12 +28,16 @@ if [[ ! -t 2 ]]; then
 fi
 
 {
+  local home=~
+  local zdotdir=${${${(q)ZDOTDIR}/#${(q)home}/'~'}//\%/%%}
+  local p10k_disp=${${${(q)POWERLEVEL9K_CONFIG_FILE}/#${(q)home}/'~'}//\%/%%}
+
   print
   -zconf-flowing -i0 -- %F{3}Zsh For Humans%f installed successfully!
   print
   -zconf-flowing -i0 -- Next steps:
   print
-  -zconf-flowing -i4 -- '  - Your' new personal Zsh config is in %U~/.zshrc%u. Edit this file to \
+  -zconf-flowing -i4 -- '  - Your' new personal Zsh config is in %U$zdotdir/.zshrc%u. Edit this file to \
                       export environment variables, define aliases, etc. There are plenty of   \
                       examples and comments to get you started.
   print
@@ -41,12 +45,12 @@ fi
     -zconf-flowing -i4 -- '  - Your' previous Zsh config files are in                              \
                         %U~/zsh-backup/${backup_dir:t}%u. They are no longer read when you start \
                         %2Fzsh%f. You might want to copy bits and pieces from them to the new    \
-                        %U~/.zshrc%u.
+                        %U$zdotdir/.zshrc%u.
     print
   fi
   if [[ /$_zconf_orig_shell == */bash ]] && (( $+commands[bash] && $#bash_rcs )); then
     -zconf-flowing -i4 -- '  - 'Zsh does not read startup files used by Bash. You might want to copy \
-                        bits and pieces from them to %U~/.zshrc%u. Here are the files:
+                        bits and pieces from them to %U$zdotdir/.zshrc%u. Here are the files:
     print
     local rc
     for rc in $bash_rcs; do
@@ -83,7 +87,7 @@ fi
     print
   else
     -zconf-flowing -i4 -- '  - Prompt' config from %4FPowerlevel10k%f is in                        \
-                        %U~/${${POWERLEVEL9K_CONFIG_FILE:t}//\%/%%}%u. To customize prompt, you  \
+                        %U$p10k_disp%u. To customize prompt, you                                 \
                         can either manually edit this file or generate a new version through the \
                         wizard:
     print

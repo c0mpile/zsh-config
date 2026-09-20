@@ -53,9 +53,9 @@ for ((i = 1; i <= $#; ++i)); do
 done
 
 local zconf_min_version
-zconf_min_version=${$(<$ZCONF/zsh4humans/version)%$'\r'} || return
+zconf_min_version=${$(<$ZCONF/zconf/version)%$'\r'} || return
 if [[ $zconf_min_version != <1-> ]]; then
-  print -Pru2 -- '%F{3}zconf%f: invalid file content: %F{1}%U$ZCONF/zsh4humans/version%f%u'
+  print -Pru2 -- '%F{3}zconf%f: invalid file content: %F{1}%U$ZCONF/zconf/version%f%u'
   return 1
 fi
 local -r zconf_min_version
@@ -98,17 +98,22 @@ local -aU zconf_retrieve_history
 
 if (( !must_passthrough )); then
   zconf_ssh_prelude=(
-    '"export" ZDOTDIR="$HOME"'
+    ': "${ZDOTDIR:=${XDG_CONFIG_HOME:-$HOME/.config}/zsh}"'
+    '"export" ZDOTDIR'
     'if command -v "locale" >"/dev/null" 2>&1; then
       "export" LC_ALL="C"
     fi')
 
   zconf_ssh_send_files=(
-    $ZDOTDIR/.zshenv   '"$ZDOTDIR"/.zshenv'
+    ~/.zshenv          '"$HOME"/.zshenv'
     $ZDOTDIR/.zprofile '"$ZDOTDIR"/.zprofile'
     $ZDOTDIR/.zshrc    '"$ZDOTDIR"/.zshrc'
     $ZDOTDIR/.zlogin   '"$ZDOTDIR"/.zlogin'
     $ZDOTDIR/.zlogout  '"$ZDOTDIR"/.zlogout')
+
+  if [[ $ZDOTDIR/.zshenv != ~/.zshenv ]]; then
+    zconf_ssh_send_files[$ZDOTDIR/.zshenv]='"$ZDOTDIR"/.zshenv'
+  fi
 
   local file
   for file in $ZDOTDIR/.p10k{,-ascii}{,-8color}.zsh(N) $ZDOTDIR/.zsh_history.*:$zconf_ssh_host(N); do
@@ -125,10 +130,12 @@ if (( !must_passthrough )); then
   fi
 
   zconf_ssh_run=(
-    'if "[" "-f" "$ZDOTDIR"/.zshenv "-a" "-r" "$ZDOTDIR"/.zshenv "]"; then
+    'if "[" "-f" "$HOME"/.zshenv "-a" "-r" "$HOME"/.zshenv "]"; then
+      "." "$HOME"/.zshenv
+    elif "[" "-f" "$ZDOTDIR"/.zshenv "-a" "-r" "$ZDOTDIR"/.zshenv "]"; then
       "." "$ZDOTDIR"/.zshenv
     else
-      >&2 "printf" "\\033[33mzconf\\033[0m: not a readable file: \\033[31m%s\033[0m\n" "$ZDOTDIR"/.zshenv
+      >&2 "printf" "\\033[33mzconf\\033[0m: not a readable file: \\033[31m%s\033[0m\n" "$HOME"/.zshenv
       "false"
     fi')
 
@@ -172,7 +179,7 @@ END
       >>~/.ssh/s/README <<\END
 
 You might also have ~/.ssh/control-master with the same file in it. This
-is the old directory that was used by zsh4humans for the same purpose
+is the old directory that was used by zconf for the same purpose
 before 2021-11-14. If you don't reference that directory explicitly from
 ~/.ssh/config, you can safely delete it.
 END
@@ -283,7 +290,7 @@ fi
   local dump_marker=${(%):-%n}.$sysparams[pid].$EPOCHSECONDS.$RANDOM
 
   local script
-  script=${"$(<$ZCONF/zsh4humans/sc/ssh-bootstrap)"//$'\r'} || return
+  script=${"$(<$ZCONF/zconf/sc/ssh-bootstrap)"//$'\r'} || return
   script=${script//'^TERM^'/${(q)term}}
   script=${script//'^MIN_VERSION^'/${(q)zconf_min_version}}
   script=${script//'^SSH_HOST^'/${(q)zconf_ssh_host}}

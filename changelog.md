@@ -46,7 +46,7 @@
   - `zconf-down-local-history` => `zconf-down-prefix-local`
   - `zconf-up-global-history` => `zconf-up-prefix-global`
   - `zconf-down-global-history` => `zconf-down-prefix-global`
-- It's now possible to automatically start `tmux` when zsh4humans is initializing.
+- It's now possible to automatically start `tmux` when zconf is initializing.
   ```zsh
   zstyle :zconf: start-tmux [arg]...
   ```
@@ -65,7 +65,7 @@
   end of the command line.
 - All `zconf-kill-*` and `zconf-backward-kill-*` widgets now add the killed region to the kill ring.
 - `zconf install` now allows specifying the branch explicitly: `zconf install user/repo@branch`.
-- If `brew` is installed, zsh4humans now automatically installs `homebrew/command-not-found`.
+- If `brew` is installed, zconf now automatically installs `homebrew/command-not-found`.
 - `command_not_found_handler` now uses `homebrew/command-not-found` if it's available.
 - Auto-update is now disabled by default. It is recommended to use `zconf update` to update
   manually.
@@ -104,7 +104,7 @@
   ```
 
   If you enable direnv integration in this way, the stock integration won't
-  do anything useful. zsh4humans will dismantle it as soon as it sees it. It's
+  do anything useful. zconf will dismantle it as soon as it sees it. It's
   highly recommended to remove stock integration calls from your zshrc to avoid
   wasting time on zsh startup and tripping over direnv quirks. The stock
   integration calls usually look like this:

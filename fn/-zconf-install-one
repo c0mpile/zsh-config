@@ -34,7 +34,7 @@ if [[ $1 == */* ]]; then
 else
   local -a channel
   zstyle -a :zconf:$1 channel channel || channel=(stable)
-  local tmux_cmd='sh -- '${(q)ZCONF}/zsh4humans/sc/install-tmux' -d "${ZCONF_PACKAGE_DIR}" -q'
+  local tmux_cmd='sh -- '${(q)ZCONF}/zconf/sc/install-tmux' -d "${ZCONF_PACKAGE_DIR}" -q'
   tmux_cmd+=' && print -r -- "$EPOCHREALTIME" >"${ZCONF_PACKAGE_DIR}"/stamp'
   case $#channel-$channel[1] in
     2-command) command=$channel[2];;
